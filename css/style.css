@@ -77,6 +77,11 @@ body {
   overflow-x: hidden;
 }
 
+body.dark-page {
+  background-color: var(--navy-900) !important;
+  color: var(--ivory-100) !important;
+}
+
 body.body--modal-open,
 body.body--menu-open,
 body.body--cb-open { overflow: hidden; }
@@ -147,6 +152,20 @@ body.body--cb-open { overflow: hidden; }
 .nav-link--active::after { transform: scaleX(1); }
 .nav-link--active { color: var(--gold-300); }
 
+.nav-link--button {
+  background: transparent;
+  border: 1px solid var(--gold-400);
+  border-radius: 999px;
+  padding: 8px 20px;
+  color: var(--gold-300) !important;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.nav-link--button:hover {
+  background: var(--gold-400);
+  color: var(--navy-900) !important;
+}
+
 /* Hamburger */
 #hamburger {
   display: none; flex-direction: column; justify-content: center; gap: 5px;
@@ -178,18 +197,26 @@ body.body--cb-open { overflow: hidden; }
 
 .colorblind-popup {
   position: fixed;
-  top: calc(var(--nav-height) + 1rem);
-  right: 1rem;
-  width: min(360px, calc(100vw - 2rem));
-  max-height: calc(100vh - calc(var(--nav-height) + 2rem));
+  top: 0;
+  left: 0;
+  width: min(380px, calc(100vw - 1rem));
+  height: 100vh;
+  max-height: 100vh;
   overflow: auto;
-  background: rgba(10, 14, 26, 0.96);
-  border: 1px solid rgba(201, 168, 76, 0.24);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
-  padding: 1.1rem 1rem 1.25rem;
+  background: rgba(10, 14, 26, 0.98);
+  border: none;
+  border-right: 1px solid rgba(201, 168, 76, 0.24);
+  border-radius: 0;
+  box-shadow: 28px 0 80px rgba(0, 0, 0, 0.5);
+  padding: calc(var(--nav-height) + 1.5rem) 1.5rem 1.5rem;
   z-index: 220;
   backdrop-filter: blur(12px);
+  animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 .colorblind-popup__header { margin-bottom: 0.9rem; padding-right: 2rem; }
 .colorblind-popup__title {
@@ -349,6 +376,7 @@ body.body--cb-open { overflow: hidden; }
   width: min(420px, calc(100vw - 2rem));
   max-width: 100%;
   background: var(--ivory-100);
+  color: var(--text-primary);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   padding: 1.5rem 1.5rem 1.2rem;
@@ -365,27 +393,27 @@ body.body--cb-open { overflow: hidden; }
   margin-bottom: 1rem;
 }
 .login-modal__text {
-  color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;
+  color: #111; font-size: 0.95rem; line-height: 1.6; font-weight: 500;
 }
 .login-form {
   display: grid; gap: 1rem;
 }
 .login-form__label {
   display: grid; gap: 0.4rem;
-  font-size: 0.9rem; color: var(--text-secondary);
+  font-size: 0.95rem; color: #000; font-weight: 700;
 }
 .login-form__label input {
   width: 100%; padding: 0.95rem 1rem;
-  border: 1px solid rgba(201, 168, 76, 0.25);
+  border: 1px solid rgba(201, 168, 76, 0.5);
   border-radius: var(--radius-md);
-  background: #fff; color: var(--text-primary);
+  background: #fff; color: #000; font-weight: 500;
 }
 .login-form__note {
-  color: var(--text-muted); font-size: 0.82rem; line-height: 1.5;
+  color: #333; font-size: 0.85rem; line-height: 1.5; font-weight: 600;
 }
 .login-modal__message {
   min-height: 1.2rem; margin-top: 0.85rem;
-  color: var(--text-primary); font-size: 0.9rem;
+  color: #000; font-size: 0.95rem; font-weight: 600;
 }
 
 .login-mode-switch {
@@ -394,14 +422,15 @@ body.body--cb-open { overflow: hidden; }
 }
 
 .login-mode-btn {
-  border: 1px solid rgba(201, 168, 76, 0.26);
+  border: 1px solid rgba(201, 168, 76, 0.5);
   background: var(--ivory-100);
-  color: var(--text-secondary);
+  color: #111;
   padding: 0.95rem 1rem;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 0.95rem;
-  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  font-weight: 700;
+  transition: all 0.25s;
 }
 
 .login-mode-btn--active {
@@ -417,6 +446,7 @@ body.body--cb-open { overflow: hidden; }
   max-height: calc(100vh - 3rem);
   overflow: auto;
   background: var(--ivory-100);
+  color: var(--text-primary);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   padding: 1.5rem;
@@ -972,7 +1002,7 @@ body.body--cb-open { overflow: hidden; }
   overflow: hidden; background: linear-gradient(135deg, rgba(10, 14, 26, 0.98), rgba(64, 76, 111, 0.88));
 }
 .modal-image-wrap img {
-  width: 100%; height: 100%; object-fit: cover;
+  width: 100%; height: 100%; object-fit: contain;
   position: absolute; inset: 0; z-index: 1;
 }
 .modal-image-placeholder {
@@ -1263,18 +1293,19 @@ body.body--cb-open { overflow: hidden; }
 }
 .batik-card__century {
   font-size: .68rem; font-weight: 700; letter-spacing: .05em;
-  color: #c9a84c; border: 1px solid rgba(201,168,76,.35);
+  color: var(--navy-800); border: 1px solid var(--navy-400);
+  background: rgba(30, 41, 59, 0.05);
   border-radius: 4px; padding: .1rem .45rem;
 }
 .batik-card__accession {
-  font-size: .63rem; color: rgba(249,240,224,.3); font-family: monospace;
+  font-size: .63rem; color: var(--navy-600); font-family: monospace;
 }
 
 /* Card: subject tags */
 .batik-card__tags { display: flex; gap: .35rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .card-tag {
-  font-size: .63rem; background: rgba(201,168,76,.08);
-  color: rgba(201,168,76,.7); border: 1px solid rgba(201,168,76,.18);
+  font-size: .63rem; background: rgba(30, 41, 59, 0.05);
+  color: var(--navy-800); border: 1px solid var(--navy-300);
   border-radius: 20px; padding: .1rem .55rem;
 }
 
@@ -1355,3 +1386,18 @@ body.body--cb-open { overflow: hidden; }
   color: rgba(249,240,224,.3); font-size: .82rem;
   text-align: center; padding: 2rem; font-style: italic;
 }
+ 
+/* Fix Dropdown options for Windows */
+select option { background: #0f172a; color: #f8fafc; padding: 8px; } 
+select { background-color: rgba(0,0,0,0.3) !important; color: white !important; } 
+
+/* Fix Text Contrast for Explorer Cards and Dashboard Placeholders */
+.batik-card__snippet { color: var(--navy-700) !important; font-weight: 500 !important; }
+.card-tag { color: var(--navy-800) !important; font-weight: 600 !important; border-color: var(--navy-300) !important; }
+.batik-card__century { color: var(--navy-900) !important; font-weight: 800 !important; border-color: var(--navy-900) !important; }
+.batik-card__accession { color: var(--navy-700) !important; font-weight: 600 !important; }
+
+input::placeholder, textarea::placeholder {
+  color: rgba(255,255,255,0.7) !important;
+}
+

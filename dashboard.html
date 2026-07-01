@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <meta
+      name="description"
+      content="Dashboard AI Museum Digital Batik Nusantara — Statistik penjelajahan, kebiasaan belajar, kuis selesai, dan visualisasi grafik aktivitas pengguna."
+    />
+    <title>Dashboard AI & Analitik — Museum Digital Nasional Indonesia</title>
+    <link rel="stylesheet" href="css/style.css?v=3" />
+    <link rel="stylesheet" href="css/collection.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+
+  <body class="dark-page">
+    <div id="page-veil" aria-hidden="true"></div>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav id="navbar" role="navigation" aria-label="Navigasi utama" class="navbar--scrolled">
+      <div class="navbar__inner">
+        <button
+          id="accessibility-toggle"
+          class="accessibility-toggle"
+          aria-label="Buka panel aksesibilitas"
+          aria-expanded="false"
+          aria-controls="colorblind-popup"
+          type="button"
+        >
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+        </button>
+
+        <a href="index.html" class="navbar__logo" aria-label="Museum Digital Nasional Indonesia — ke halaman utama">
+          <span class="navbar__logo-title">Museum Digital</span>
+          <span class="navbar__logo-sub">Nasional Indonesia</span>
+        </a>
+
+        <button
+          id="hamburger"
+          aria-label="Buka menu navigasi"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+          type="button"
+        >
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+        </button>
+
+        <div id="nav-menu" role="menubar">
+          <a href="index.html" class="nav-link" role="menuitem">Beranda</a>
+          <a href="about.html" class="nav-link" role="menuitem">Tentang</a>
+          <a href="explorer.html" class="nav-link" role="menuitem">Koleksi</a>
+          <a href="ai-center.html" class="nav-link" role="menuitem">AI Center</a>
+          <a href="quiz.html" class="nav-link" role="menuitem">Quiz AI</a>
+          <a href="dashboard.html" class="nav-link nav-link--active" role="menuitem">Dashboard</a>
+          <button id="admin-panel-button" class="nav-link nav-link--button btn-small" type="button" aria-label="Buka panel admin" hidden>Admin</button>
+          <button id="login-button" class="nav-link nav-link--button" type="button" aria-label="Masuk atau profil pengguna">Masuk</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===================== EXPLORER HEADER ===================== -->
+    <header class="explorer-header-section" style="padding: 120px 2rem 30px; text-align: center; background: var(--navy-900);">
+      <h1 style="font-family: var(--font-display); color: var(--gold-400); font-size: 2.5rem; margin-bottom: 8px;">Dashboard Analisis AI</h1>
+      <p style="color: var(--text-light-muted); max-width: 600px; margin: 0 auto; font-size: 0.95rem;">
+        Statistik interaksi riil Anda selama menjelajah, belajar, dan menguji wawasan di Museum Batik Nusantara Berbasis AI.
+      </p>
+    </header>
+
+    <!-- ===================== MAIN METRICS ===================== -->
+    <main style="max-width: var(--max-width); margin: 30px auto 80px; padding: 0 2rem;">
+      
+      <div id="dashboard-auth-prompt" style="text-align: center; margin-top: 50px;">
+        <h2 style="color: var(--navy-800); margin-bottom: 15px;">Akses Terbatas</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Silakan masuk (login) untuk melihat dashboard analitik Anda.</p>
+        <button class="btn-primary" onclick="document.getElementById('login-button').click()">Masuk Sekarang</button>
+      </div>
+
+      <!-- ADMIN DASHBOARD VIEW -->
+      <div id="admin-dashboard-view" style="display:none;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: var(--navy-800); border-bottom: 2px solid var(--gold-400); padding-bottom: 10px;">Ringkasan Data Global (Admin)</h2>
+        
+        <!-- Metrics Grid -->
+        <div class="dashboard-grid">
+          <div class="dashboard-stat-card glass-card">
+            <span class="dashboard-stat-card__icon">🏛️</span>
+            <span id="dash-stat-collection" class="dashboard-stat-card__value">—</span>
+            <span class="dashboard-stat-card__label">Total Koleksi Motif</span>
+          </div>
+          <div class="dashboard-stat-card glass-card">
+            <span class="dashboard-stat-card__icon">🔍</span>
+            <span id="dash-stat-searches" class="dashboard-stat-card__value">—</span>
+            <span class="dashboard-stat-card__label">Pencarian Koleksi</span>
+          </div>
+          <div class="dashboard-stat-card glass-card">
+            <span class="dashboard-stat-card__icon">🤖</span>
+            <span id="dash-stat-recommendations" class="dashboard-stat-card__value">—</span>
+            <span class="dashboard-stat-card__label">Interaksi AI Kurator</span>
+          </div>
+          <div class="dashboard-stat-card glass-card">
+            <span class="dashboard-stat-card__icon">🎯</span>
+            <span id="dash-stat-quizzes" class="dashboard-stat-card__value">—</span>
+            <span class="dashboard-stat-card__label">Kuis Selesai</span>
+          </div>
+        </div>
+
+        <!-- Analytics Layout -->
+        <div class="dashboard-layout" style="margin-top: 30px;">
+          <!-- Left: Activity Chart -->
+          <div class="dashboard-panel glass-card">
+            <h3 class="dashboard-panel__title" style="margin-bottom: 15px;">
+              <span class="dashboard-panel__title-icon">📈</span> Grafik Aktivitas Mingguan (AI Tracker)
+            </h3>
+            <div id="dash-activity-chart" class="activity-chart-panel"></div>
+          </div>
+          
+          <!-- Right: Popularities -->
+          <div class="dashboard-panel">
+            <div class="popularity-card glass-card">
+              <div class="popularity-card__avatar">🦚</div>
+              <div class="popularity-card__content">
+                <p class="popularity-card__label">Motif Terpopuler</p>
+                <p id="dash-popular-motif" class="popularity-card__value">—</p>
+              </div>
+            </div>
+
+            <div class="popularity-card glass-card">
+              <div class="popularity-card__avatar">🗺️</div>
+              <div class="popularity-card__content">
+                <p class="popularity-card__label">Daerah Budaya Terpopuler</p>
+                <p id="dash-popular-region" class="popularity-card__value">—</p>
+              </div>
+            </div>
+
+            <div class="popularity-card glass-card">
+              <div class="popularity-card__avatar">👥</div>
+              <div class="popularity-card__content">
+                <p class="popularity-card__label">Estimasi Pengunjung Museum</p>
+                <p id="dash-visitor-count" class="popularity-card__value">—</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Monitoring Section (Admin Only) -->
+        <div class="glass-card" style="margin-top: 30px;">
+          <h3 class="dashboard-panel__title" style="margin-bottom: 15px;">
+            <span class="dashboard-panel__title-icon">🛡️</span> Sistem Pemantauan Akun Pengguna
+          </h3>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid rgba(0,0,0,0.1);">
+                  <th style="padding: 12px; color: var(--navy-800);">Username</th>
+                  <th style="padding: 12px; color: var(--navy-800);">Peran</th>
+                  <th style="padding: 12px; color: var(--navy-800);">Aktivitas (Saran & Kuis)</th>
+                  <th style="padding: 12px; color: var(--navy-800);">Aksi (Pemulihan Gmail)</th>
+                </tr>
+              </thead>
+              <tbody id="dash-admin-users-list">
+                <!-- User rows injected here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="glass-card" style="margin-top: 30px;">
+          <h3 class="dashboard-panel__title" style="margin-bottom: 15px;">
+            <span class="dashboard-panel__title-icon">📋</span> Riwayat Aktivitas Sistem Terkini
+          </h3>
+          <ul id="dash-activity-logs" style="list-style: none; padding: 0; margin: 0;"></ul>
+        </div>
+        
+        <!-- Manage Batik Panel -->
+        <div class="dash-section" style="margin-top: 30px;">
+          <h3 style="color: var(--gold-400); margin-bottom: 20px; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Manajemen Koleksi Batik</h3>
+          <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.05);">
+            <div style="margin-bottom: 15px;">
+              <select id="edit-batik-select" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; padding: 10px; font-family: inherit;">
+                <option value="">--- ➕ Tambah Batik Baru ---</option>
+              </select>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+              <input type="text" id="add-batik-name" placeholder="Nama Batik (Contoh: Megamendung)" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; padding: 10px; font-family: inherit;">
+              <input type="text" id="add-batik-region" placeholder="Asal Daerah (Contoh: Cirebon)" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; padding: 10px; font-family: inherit;">
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label for="add-batik-image" style="display:block; margin-bottom:5px; font-size:0.9rem; color:var(--gold-400);">Unggah Foto Display Utama (JPG/PNG)</label>
+              <input type="file" id="add-batik-image" accept="image/*" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; padding: 10px; font-family: inherit;">
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label for="add-batik-samples-file" style="display:block; margin-bottom:5px; font-size:0.9rem; color:var(--gold-400);">Unggah Foto Terkait / Galeri Mini (Bisa Lebih Dari 1)</label>
+              <input type="file" id="add-batik-samples-file" multiple accept="image/*" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; padding: 10px; font-family: inherit;">
+            </div>
+            <textarea id="add-batik-desc" rows="3" placeholder="Deskripsi Sejarah/Makna Batik" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; color: white; padding: 10px; font-family: inherit; margin-bottom: 15px; resize: vertical;"></textarea>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button id="add-batik-btn" class="btn-primary" style="padding: 10px 25px;">Simpan Batik</button>
+              <span id="add-batik-msg" style="font-size: 0.9rem; color: #2ecc71;"></span>
+            </div>
+          </div>
+        </div>
+          <!-- ADMIN RADAR UI -->
+          <div style="margin-top: 30px; background: rgba(0,0,0,0.85); border: 1px solid var(--gold-500); border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+            <h3 style="color: var(--gold-400); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-family: monospace;">
+              <span style="width:12px; height:12px; background: #2ecc71; border-radius:50%; box-shadow: 0 0 10px #2ecc71; animation: pulse 1.5s infinite;"></span>
+              RADAR PEMANTAUAN (LIVE)
+            </h3>
+            <div id="admin-radar-feed" style="height: 250px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; color: #a8b2d1; background: #0a0e17; padding: 15px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1);">
+              <div style="color: #4CAF50;">[SISTEM] Menghubungkan ke satelit pelacakan aktivitas...</div>
+            </div>
+          </div>
+      </div> <!-- End Admin Dashboard View -->
+
+      <!-- USER DASHBOARD VIEW -->
+      <div id="user-dashboard-view" style="display:none;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: var(--navy-800); border-bottom: 2px solid var(--gold-400); padding-bottom: 10px;">Dashboard Personal Anda</h2>
+        
+        <!-- User Profile Card -->
+        <div class="glass-card" style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
+          <div style="font-size: 3rem; background: rgba(201, 168, 76, 0.1); padding: 15px; border-radius: 50%; border: 1px solid var(--gold-400);">👤</div>
+          <div>
+            <h3 id="dash-user-name" style="color: var(--gold-400); font-size: 1.4rem; margin-bottom: 5px;">Username</h3>
+            <p id="dash-user-status" style="color: var(--text-light-muted); font-size: 0.9rem;">Status Akun: <strong>Pengunjung Terdaftar</strong></p>
+            <button id="btn-request-delete" class="btn-primary" style="background: rgba(231,76,60,0.2); border: 1px solid #e74c3c; color: #e74c3c; padding: 5px 15px; margin-top: 10px; font-size: 0.8rem;">Minta Hapus Akun</button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="dashboard-stat-card glass-card">
+            <span class="dashboard-stat-card__icon">🏆</span>
+            <span id="user-dash-quizzes" class="dashboard-stat-card__value">0</span>
+            <span class="dashboard-stat-card__label">Kuis Diikuti</span>
+          </div>
+          <div class="dashboard-stat-card glass-card">
+            <span class="dashboard-stat-card__icon">⭐</span>
+            <span id="user-dash-score" class="dashboard-stat-card__value">0</span>
+            <span class="dashboard-stat-card__label">Rata-rata Nilai Kuis</span>
+          </div>
+          <div class="dashboard-stat-card glass-card">
+            <span class="dashboard-stat-card__icon">💬</span>
+            <span id="user-dash-comments" class="dashboard-stat-card__value">0</span>
+            <span class="dashboard-stat-card__label">Saran Diberikan</span>
+          </div>
+        </div>
+
+        <div class="dashboard-layout" style="margin-top: 30px;">
+          <!-- Left: User Quiz Logs -->
+          <div class="dashboard-panel glass-card">
+            <h3 class="dashboard-panel__title" style="margin-bottom: 15px;">
+              <span class="dashboard-panel__title-icon">📋</span> Riwayat Kuis Anda
+            </h3>
+            <ul id="user-dash-quiz-logs" style="list-style: none; padding: 0; margin: 0;"></ul>
+          </div>
+          
+          <!-- Right: User Access Hub & Favorites -->
+          <div class="dashboard-panel">
+            <!-- Access Hub -->
+            <div class="glass-card" style="margin-bottom: 20px;">
+              <h3 class="dashboard-panel__title" style="margin-bottom: 15px; font-size:1.1rem;">
+                <span class="dashboard-panel__title-icon">🚀</span> Ruang Lingkup Akses Anda
+              </h3>
+              <p style="color:var(--text-light-muted); font-size:0.9rem; margin-bottom:15px; line-height:1.5;">Sebagai pengunjung terdaftar, Anda memiliki akses penuh ke fitur edukasi interaktif museum:</p>
+              <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:10px;">
+                <li><a href="explorer.html" class="btn-ghost btn-full" style="justify-content:flex-start; font-size:0.9rem;">🔎 Jelajahi Koleksi & Beri Saran</a></li>
+                <li><a href="quiz.html" class="btn-ghost btn-full" style="justify-content:flex-start; font-size:0.9rem;">🎓 Uji Wawasan (Quiz AI)</a></li>
+                <li><a href="ai-center.html" class="btn-ghost btn-full" style="justify-content:flex-start; font-size:0.9rem;">🤖 Tanya AI Kurator</a></li>
+              </ul>
+            </div>
+            
+            <!-- User Favorites -->
+            <div class="glass-card">
+              <h3 class="dashboard-panel__title" style="margin-bottom: 15px; font-size:1.1rem;">
+                <span class="dashboard-panel__title-icon">❤️</span> Koleksi Batik Favorit
+              </h3>
+              <ul id="user-dash-favorites" style="list-style: none; padding: 0; margin: 0;"></ul>
+            </div>
+          </div>
+        </div>
+      </div> <!-- End User Dashboard View -->
+
+    </main>
+
+    <!-- ===================== POPUPS & MODALS ===================== -->
+    <aside id="colorblind-popup" class="colorblind-popup" role="dialog" aria-modal="true" aria-labelledby="cb-popup-title" hidden aria-hidden="true">
+      <button id="colorblind-popup-close" class="colorblind-popup__close" aria-label="Tutup mode aksesibilitas" type="button">×</button>
+      <div class="colorblind-popup__header">
+        <p class="cb-mode-group__title">Mode Aksesibilitas</p>
+        <h3 id="cb-popup-title" class="colorblind-popup__title">Simulasi Buta Warna</h3>
+      </div>
+      <div class="colorblind-popup__content">
+        <button class="cb-btn cb-btn--active" data-cb-mode="normal" aria-pressed="true" aria-label="Normal"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #2ecc71 33% 66%, #3498db 66%);"></span>Normal</button>
+        <button class="cb-btn" data-cb-mode="protanopia" aria-pressed="false" aria-label="Protanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #808000 33%, #808000 33% 66%, #3498db 66%);"></span>Protanopia</button>
+        <button class="cb-btn" data-cb-mode="deuteranopia" aria-pressed="false" aria-label="Deuteranopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #c8a000 33%, #c8a000 33% 66%, #3498db 66%);"></span>Deuteranopia</button>
+        <button class="cb-btn" data-cb-mode="tritanopia" aria-pressed="false" aria-label="Tritanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #00b0b0 33% 66%, #00b0b0 66%);"></span>Tritanopia</button>
+      </div>
+    </aside>
+
+    <aside id="login-modal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden aria-hidden="true">
+      <button id="login-close-btn" class="login-modal__close" aria-label="Tutup login" type="button">×</button>
+      <div class="login-modal__header">
+        <h3 id="login-title">Masuk ke Akun</h3>
+        <p class="login-modal__text">Masuk untuk menyimpan motif favorit, membuat akun, atau akses panel admin jika Anda admin.</p>
+      </div>
+      <div class="login-mode-switch">
+        <button type="button" id="login-mode-btn" class="login-mode-btn login-mode-btn--active">Masuk</button>
+        <button type="button" id="register-mode-btn" class="login-mode-btn">Daftar</button>
+      </div>
+      <form id="login-form" class="login-form" autocomplete="off">
+        <label class="login-form__label">
+          Nama Pengguna
+          <input id="login-username" name="username" type="text" required autocomplete="username" />
+        </label>
+        <label class="login-form__label">
+          Kata Sandi
+          <input id="login-password" name="password" type="password" required autocomplete="current-password" />
+        </label>
+
+        <button id="auth-submit-btn" type="submit" class="btn-primary btn-full">Masuk</button>
+        <p id="auth-hint" class="login-form__note">Jika belum punya akun, daftar dulu.</p>
+      </form>
+      <button id="logout-button" class="btn-ghost btn-full" type="button" hidden>Keluar</button>
+      <p id="login-message" class="login-modal__message" aria-live="polite"></p>
+    </aside>
+
+    <aside id="admin-user-modal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="admin-user-title" hidden aria-hidden="true" style="width: 90%; max-width: 600px;">
+      <button id="admin-user-close-btn" class="login-modal__close" aria-label="Tutup inspeksi" type="button" style="color: var(--navy-800);">×</button>
+      <div class="login-modal__header">
+        <h3 id="admin-user-title" style="color: var(--navy-800);">Inspeksi Akun: @username</h3>
+        <p class="login-modal__text" id="admin-user-role" style="margin-top: 5px; font-weight: bold; color: var(--navy-700);"></p>
+      </div>
+      
+      <div style="max-height: 60vh; overflow-y: auto; padding-right: 5px; text-align: left; margin-top: 20px;">
+        <!-- Koleksi Favorit -->
+        <h4 style="color: var(--navy-800); font-size: 0.95rem; margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom:5px; font-weight: bold;">Koleksi Favorit</h4>
+        <div id="admin-inspect-favorites" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+          <!-- Badge favorit -->
+        </div>
+
+        <!-- Riwayat Kuis -->
+        <h4 style="color: var(--navy-800); font-size: 0.95rem; margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom:5px; font-weight: bold;">Riwayat Kuis</h4>
+        <ul id="admin-inspect-quizzes" style="list-style: none; padding: 0; margin: 0 0 20px 0; display: flex; flex-direction: column; gap: 8px;">
+          <!-- Item kuis -->
+        </ul>
+
+        <!-- Riwayat Saran -->
+        <h4 style="color: var(--navy-800); font-size: 0.95rem; margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom:5px; font-weight: bold;">Riwayat Saran & Komentar</h4>
+        <div id="admin-inspect-comments" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Saran card -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Footer -->
+    <footer id="footer" role="contentinfo">
+      <div class="footer__inner">
+        <div>
+          <p class="footer__brand-name">Museum Digital Nasional Indonesia</p>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span id="footer-year"></span> Museum Digital Nasional Indonesia.</p>
+      </div>
+    </footer>
+
+    <!-- Cache-busting scripts -->
+    <script src="js/data.js?v=2"></script>
+    <script src="js/nav.js?v=2"></script>
+    <script src="js/colorblind.js?v=2"></script>
+    <script src="js/dashboard.js?v=2"></script>
+    <script src="js/auth.js?v=2"></script>
+    <script src="js/main.js?v=2"></script>
+    <script>
+      document.getElementById("footer-year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>

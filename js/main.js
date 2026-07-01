@@ -12,6 +12,7 @@
     if (window.Nav) Nav.init();
     if (window.Modal) Modal.init();
     if (window.Auth) Auth.init();
+    if (window.Dashboard) Dashboard.init();
     if (window.Admin) Admin.init();
     if (window.Explorer) Explorer.init();
     if (window.ColorBlind) ColorBlind.init();

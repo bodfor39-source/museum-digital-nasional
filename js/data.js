@@ -452,6 +452,29 @@ const COLOR_SWATCHES = [
   { name: "Putih/Krem", hex: "#FEF3C7", pattern: "stipple",   keywords: ["putih","krem","gading","mori","ivory","sutra","tulang","alami","bersih"] },
 ];
 
-window.BATIK_DATA   = BATIK_DATA;
+try {
+  let localBatiks = JSON.parse(localStorage.getItem("global_batik_data"));
+  if (!localBatiks) {
+    localBatiks = BATIK_DATA;
+    localStorage.setItem("global_batik_data", JSON.stringify(localBatiks));
+  }
+  
+  const customBatiks = JSON.parse(localStorage.getItem("custom_batik_data") || "[]");
+  if (Array.isArray(customBatiks) && customBatiks.length > 0) {
+    customBatiks.forEach(c => {
+      if (!localBatiks.find(b => b.id === c.id)) {
+        localBatiks.push(c);
+      }
+    });
+    localStorage.setItem("global_batik_data", JSON.stringify(localBatiks));
+    localStorage.removeItem("custom_batik_data"); // Migrasi selesai
+  }
+  
+  window.BATIK_DATA = localBatiks;
+} catch (e) {
+  console.warn("Gagal memuat batik dari memori", e);
+  window.BATIK_DATA = BATIK_DATA;
+}
+
 window.REGIONS      = REGIONS;
 window.COLOR_SWATCHES = COLOR_SWATCHES;

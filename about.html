@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <meta
+      name="description"
+      content="Tentang Museum Digital Nasional Indonesia — Warisan Budaya Takbenda, standar CIDOC-CRM metadata, dan penjelasan integrasi Artificial Intelligence."
+    />
+    <title>Tentang Museum — Museum Digital Nasional Indonesia</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <div id="page-veil" aria-hidden="true"></div>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav id="navbar" role="navigation" aria-label="Navigasi utama" class="navbar--scrolled">
+      <div class="navbar__inner">
+        <button
+          id="accessibility-toggle"
+          class="accessibility-toggle"
+          aria-label="Buka panel aksesibilitas"
+          aria-expanded="false"
+          aria-controls="colorblind-popup"
+          type="button"
+        >
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+        </button>
+
+        <a href="index.html" class="navbar__logo" aria-label="Museum Digital Nasional Indonesia — ke halaman utama">
+          <span class="navbar__logo-title">Museum Digital</span>
+          <span class="navbar__logo-sub">Nasional Indonesia</span>
+        </a>
+
+        <button
+          id="hamburger"
+          aria-label="Buka menu navigasi"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+          type="button"
+        >
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+        </button>
+
+        <div id="nav-menu" role="menubar">
+          <a href="index.html" class="nav-link" role="menuitem">Beranda</a>
+          <a href="about.html" class="nav-link nav-link--active" role="menuitem">Tentang</a>
+          <a href="explorer.html" class="nav-link" role="menuitem">Koleksi</a>
+          <a href="ai-center.html" class="nav-link" role="menuitem">AI Center</a>
+          <a href="quiz.html" class="nav-link" role="menuitem">Quiz AI</a>
+          <a href="dashboard.html" class="nav-link" role="menuitem">Dashboard</a>
+          <button id="admin-panel-button" class="nav-link nav-link--button btn-small" type="button" aria-label="Buka panel admin" hidden>Admin</button>
+          <button id="login-button" class="nav-link nav-link--button" type="button" aria-label="Masuk atau profil pengguna">Masuk</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===================== EXPLORER HEADER ===================== -->
+    <header class="explorer-header-section" style="padding: 120px 2rem 30px; text-align: center; background: var(--navy-900);">
+      <h1 style="font-family: var(--font-display); color: var(--gold-400); font-size: 2.5rem; margin-bottom: 8px;">Tentang Museum</h1>
+      <p style="color: var(--text-light-muted); max-width: 600px; margin: 0 auto; font-size: 0.95rem;">
+        Ruang pelestarian budaya digital nasional yang menggabungkan warisan tradisional luhur dengan kecerdasan teknologi modern.
+      </p>
+    </header>
+
+    <!-- ===================== ABOUT CONTENT ===================== -->
+    <main style="max-width: 900px; margin: 50px auto 80px; padding: 0 2rem; color: var(--text-primary); line-height: 1.8;">
+      <section style="margin-bottom: 40px;">
+        <h2 style="font-family: var(--font-display); color: var(--navy-900); font-size: 2rem; margin-bottom: 15px;">Misi Pelestarian Digital</h2>
+        <p>
+          Batik Indonesia merupakan salah satu Warisan Kemanusiaan untuk Budaya Lisan dan Takbenda (Intangible Cultural Heritage) yang telah diakui oleh UNESCO sejak tahun 2009. 
+          Museum Digital Nasional Indonesia hadir sebagai wadah inovasi edukatif untuk merawat warisan berharga tersebut, memastikan filosofi mendalam dan nilai sejarah dari tiap goresan lilin malam motif batik Nusantara dapat dipelajari dengan mudah oleh generasi muda.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 40px; padding: 2rem; background: rgba(13, 21, 38, 0.03); border-radius: var(--radius-md); border: 1px solid rgba(13, 21, 38, 0.08);">
+        <h3 style="font-family: var(--font-display); color: var(--navy-900); font-size: 1.4rem; margin-bottom: 10px;">Standar Internasional Pengarsipan</h3>
+        <p style="font-size: 0.95rem; color: var(--text-secondary);">
+          Guna menjamin keandalan data akademis, pengumpulan koleksi batik di website ini dikatalogkan berdasarkan standar data museum internasional:
+        </p>
+        <ul style="padding-left: 20px; margin-top: 10px; font-size: 0.95rem; color: var(--text-secondary);">
+          <li><strong>CIDOC-CRM (CIDOC Conceptual Reference Model)</strong>: Model referensi ontologi formal untuk mengaitkan informasi hubungan historis produksi objek warisan budaya (pembuat, abad, wilayah asal, material).</li>
+          <li><strong>Dublin Core Metadata Initiative (DCMI)</strong>: Standar metadata web universal untuk pendokumentasian sumber informasi digital (judul, hak cipta, penyedia konten).</li>
+        </ul>
+      </section>
+
+      <section style="margin-bottom: 40px;">
+        <h2 style="font-family: var(--font-display); color: var(--navy-900); font-size: 1.8rem; margin-bottom: 15px;">Integrasi Artificial Intelligence</h2>
+        <p>
+          Melalui pengembangan termutakhir, website ini bertransformasi menjadi museum interaktif berbasis AI yang menyuguhkan fungsi nyata bagi pengunjung:
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+          <div style="padding: 1.5rem; background: var(--ivory-200); border-radius: var(--radius-sm);">
+            <h4 style="color: var(--navy-700); margin-bottom: 5px;">🤖 Smart Search & Recommendations</h4>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Memahami maksud pencarian bahasa alami dan preferensi acara sosial Anda untuk mencocokkan kain batik paling ideal.</p>
+          </div>
+          <div style="padding: 1.5rem; background: var(--ivory-200); border-radius: var(--radius-sm);">
+            <h4 style="color: var(--navy-700); margin-bottom: 5px;">💬 AI Curator & Audio Guide</h4>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Ki Kurator virtual siap menjawab pertanyaan adat apa saja, dilengkapi panduan pembaca audio terintegrasi untuk inklusivitas tunanetra.</p>
+          </div>
+        </div>
+      </section>
+
+      <section style="margin-bottom: 20px;">
+        <h3 style="font-family: var(--font-display); color: var(--navy-900); font-size: 1.4rem; margin-bottom: 10px;">Peneliti Lapangan / Kontributor Mahasiswa</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+          Koleksi awal batik di website ini didokumentasikan berdasarkan penelitian lapangan komprehensif oleh mahasiswa berdedikasi tinggi, tercatat resmi dalam berkas <em>tahap_1.xlsx</em>. 
+          Nama-nama kontributor dapat dilihat secara terbuka di tab 'Metadata' pada popup detail masing-masing kain batik.
+        </p>
+      </section>
+    </main>
+
+    <!-- Popups -->
+    <aside id="colorblind-popup" class="colorblind-popup" role="dialog" aria-modal="true" aria-labelledby="cb-popup-title" hidden aria-hidden="true">
+      <button id="colorblind-popup-close" class="colorblind-popup__close" aria-label="Tutup mode aksesibilitas" type="button">×</button>
+      <div class="colorblind-popup__header">
+        <h3 id="cb-popup-title" class="colorblind-popup__title">Simulasi Buta Warna</h3>
+      </div>
+      <div class="colorblind-popup__content">
+        <button class="cb-btn cb-btn--active" data-cb-mode="normal" aria-pressed="true" aria-label="Normal"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #2ecc71 33% 66%, #3498db 66%);"></span>Normal</button>
+        <button class="cb-btn" data-cb-mode="protanopia" aria-pressed="false" aria-label="Protanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #808000 33%, #808000 33% 66%, #3498db 66%);"></span>Protanopia</button>
+        <button class="cb-btn" data-cb-mode="deuteranopia" aria-pressed="false" aria-label="Deuteranopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #c8a000 33%, #c8a000 33% 66%, #3498db 66%);"></span>Deuteranopia</button>
+        <button class="cb-btn" data-cb-mode="tritanopia" aria-pressed="false" aria-label="Tritanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #00b0b0 33% 66%, #00b0b0 66%);"></span>Tritanopia</button>
+      </div>
+    </aside>
+
+    <aside id="login-modal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden aria-hidden="true">
+      <button id="login-close-btn" class="login-modal__close" aria-label="Tutup login" type="button">×</button>
+      <div class="login-modal__header">
+        <h3 id="login-title">Masuk ke Akun</h3>
+        <p class="login-modal__text">Masuk untuk menyimpan motif favorit, membuat akun, atau akses panel admin jika Anda admin.</p>
+      </div>
+      <div class="login-mode-switch">
+        <button type="button" id="login-mode-btn" class="login-mode-btn login-mode-btn--active">Masuk</button>
+        <button type="button" id="register-mode-btn" class="login-mode-btn">Daftar</button>
+      </div>
+      <form id="login-form" class="login-form" autocomplete="off">
+        <label class="login-form__label">
+          Nama Pengguna
+          <input id="login-username" name="username" type="text" required autocomplete="username" />
+        </label>
+        <label class="login-form__label">
+          Kata Sandi
+          <input id="login-password" name="password" type="password" required autocomplete="current-password" />
+        </label>
+
+        <button id="auth-submit-btn" type="submit" class="btn-primary btn-full">Masuk</button>
+        <p id="auth-hint" class="login-form__note">Jika belum punya akun, daftar dulu.</p>
+      </form>
+      <button id="logout-button" class="btn-ghost btn-full" type="button" hidden>Keluar</button>
+      <p id="login-message" class="login-modal__message" aria-live="polite"></p>
+    </aside>
+
+    <!-- Footer -->
+    <footer id="footer" role="contentinfo">
+      <div class="footer__inner">
+        <div>
+          <p class="footer__brand-name">Museum Digital Nasional Indonesia</p>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span id="footer-year"></span> Museum Digital Nasional Indonesia.</p>
+      </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="js/data.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/colorblind.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      document.getElementById("footer-year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>

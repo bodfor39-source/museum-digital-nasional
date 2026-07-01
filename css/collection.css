@@ -1,0 +1,86 @@
+/**
+ * collection.css — Styling Detail Koleksi & Similar Collection
+ * Mengatur tampilan layout detail motif, kemiripan koefisien, dan navigasi modal silang.
+ * Museum Digital Nasional Indonesia
+ */
+
+/* --- 1. SIMILAR COLLECTIONS IN MODAL --- */
+.modal-similar-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.similar-item-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+.similar-item-card:hover {
+  background: rgba(201, 168, 76, 0.08);
+  border-color: rgba(201, 168, 76, 0.3);
+  transform: translateY(-2px);
+}
+
+.similar-item-card__img {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+
+.similar-item-card__info {
+  flex: 1;
+  min-width: 0; /* Mencegah overflow teks */
+}
+
+.similar-item-card__name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ivory-100);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.similar-item-card__match {
+  font-size: 0.72rem;
+  color: var(--gold-400);
+  font-weight: bold;
+}
+
+/* --- 2. EXTENSIONS FOR DETAILS WINDOW --- */
+.rights-link {
+  color: var(--gold-400);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.rights-link:hover {
+  color: var(--gold-200);
+  text-decoration: underline;
+}
+
+.contrib-item {
+  display: inline-block;
+  background: rgba(255,255,255,0.04);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-right: 6px;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+}
+.contrib-item code {
+  color: var(--gold-300);
+  margin-left: 4px;
+}

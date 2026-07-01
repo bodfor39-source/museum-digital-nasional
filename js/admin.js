@@ -101,6 +101,15 @@ const Admin = (() => {
       imageUrlInput.addEventListener("change", handleImageUrlChange);
       imageUrlInput.addEventListener("blur", handleImageUrlChange);
     }
+
+    const adminDeleteBtn = document.getElementById("admin-delete-btn");
+    if (adminDeleteBtn) {
+      adminDeleteBtn.addEventListener("click", () => {
+        if (selectedExistingMotifId) {
+          deleteMotif(selectedExistingMotifId);
+        }
+      });
+    }
   }
 
   function populateRegionOptions() {
@@ -162,6 +171,39 @@ const Admin = (() => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
     } catch (error) {
       console.warn("Gagal menyimpan motif tambahan", error);
+    }
+  }
+
+  function deleteMotif(motifId) {
+    if (!confirm("Admin: Anda yakin ingin menghapus motif ini beserta semua datanya secara permanen?")) return;
+    
+    // Hapus dari localStorage
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const extraMotifs = JSON.parse(stored);
+        if (Array.isArray(extraMotifs)) {
+          const filtered = extraMotifs.filter((item) => item.id !== motifId);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+        }
+      }
+    } catch (error) {
+      console.warn("Gagal menghapus motif dari localStorage", error);
+    }
+
+    // Hapus dari BATIK_DATA in memory
+    const existingIndex = window.BATIK_DATA.findIndex((item) => item.id === motifId);
+    if (existingIndex >= 0) {
+      window.BATIK_DATA.splice(existingIndex, 1);
+    }
+
+    resetAdminForm({ keepTemplate: false });
+    populateMotifOptions();
+    updateSubmitMode();
+    renderAdminMessage("Motif berhasil dihapus dari koleksi.", "success");
+
+    if (window.Explorer) {
+      window.Explorer.applyFilters();
     }
   }
 
@@ -360,8 +402,13 @@ const Admin = (() => {
   }
 
   function updateSubmitMode() {
-    if (!adminSubmitBtn) return;
-    adminSubmitBtn.textContent = selectedExistingMotifId ? "Simpan Perubahan" : "Tambah Motif";
+    if (adminSubmitBtn) {
+      adminSubmitBtn.textContent = selectedExistingMotifId ? "Simpan Perubahan" : "Tambah Motif";
+    }
+    const adminDeleteBtn = document.getElementById("admin-delete-btn");
+    if (adminDeleteBtn) {
+      adminDeleteBtn.style.display = selectedExistingMotifId ? "block" : "none";
+    }
   }
 
   function generateSlug(text) {

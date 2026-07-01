@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <meta
+      name="description"
+      content="Galeri Digital Museum Batik Nusantara — Pencarian, filter wilayah, dan warna motif batik tradisional dari seluruh penjuru Indonesia."
+    />
+    <title>Galeri Koleksi Batik — Museum Digital Nasional Indonesia</title>
+    <link rel="stylesheet" href="css/style.css?v=3" />
+    <link rel="stylesheet" href="css/collection.css" />
+    <link rel="stylesheet" href="css/explorer.css" />
+  </head>
+
+  <body>
+    <div id="page-veil" aria-hidden="true"></div>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav id="navbar" role="navigation" aria-label="Navigasi utama" class="navbar--scrolled">
+      <div class="navbar__inner">
+        <button
+          id="accessibility-toggle"
+          class="accessibility-toggle"
+          aria-label="Buka panel aksesibilitas"
+          aria-expanded="false"
+          aria-controls="colorblind-popup"
+          type="button"
+        >
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+        </button>
+
+        <a href="index.html" class="navbar__logo" aria-label="Museum Digital Nasional Indonesia — ke halaman utama">
+          <span class="navbar__logo-title">Museum Digital</span>
+          <span class="navbar__logo-sub">Nasional Indonesia</span>
+        </a>
+
+        <button
+          id="hamburger"
+          aria-label="Buka menu navigasi"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+          type="button"
+        >
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+        </button>
+
+        <div id="nav-menu" role="menubar">
+          <a href="index.html" class="nav-link" role="menuitem">Beranda</a>
+          <a href="about.html" class="nav-link" role="menuitem">Tentang</a>
+          <a href="explorer.html" class="nav-link nav-link--active" role="menuitem">Koleksi</a>
+          <a href="ai-center.html" class="nav-link" role="menuitem">AI Center</a>
+          <a href="quiz.html" class="nav-link" role="menuitem">Quiz AI</a>
+          <a href="dashboard.html" class="nav-link" role="menuitem">Dashboard</a>
+          <button id="admin-panel-button" class="nav-link nav-link--button btn-small" type="button" aria-label="Buka panel admin" hidden>Admin</button>
+          <button id="login-button" class="nav-link nav-link--button" type="button" aria-label="Masuk atau profil pengguna">Masuk</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===================== EXPLORER HEADER ===================== -->
+    <header class="explorer-header-section" style="padding: 120px 2rem 30px; text-align: center; background: var(--navy-900);">
+      <h1 style="font-family: var(--font-display); color: var(--gold-400); font-size: 2.5rem; margin-bottom: 8px;">Koleksi Motif Nusantara</h1>
+      <p style="color: var(--text-light-muted); max-width: 600px; margin: 0 auto; font-size: 0.95rem;">
+        Jelajahi keindahan estetika dan kedalaman makna motif batik warisan luhur Indonesia menggunakan filter daerah, warna, atau kata kunci.
+      </p>
+    </header>
+
+    <!-- ===================== KOLEKSI EXPLORER ===================== -->
+    <section id="koleksi" style="padding-top: 20px;">
+      <div class="explorer__layout">
+        <!-- Sidebar filter -->
+        <aside class="explorer__sidebar" aria-label="Panel filter koleksi">
+          <p class="sidebar__title">Filter Koleksi</p>
+
+          <!-- Pencarian teks -->
+          <div class="sidebar__group">
+            <label for="search-input" class="sidebar__group-label">Cari Motif</label>
+            <div class="search-input-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                id="search-input"
+                type="search"
+                placeholder="nama motif, makna, asal…"
+                aria-label="Cari motif batik"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <!-- Filter wilayah -->
+          <div class="sidebar__group">
+            <label for="region-filter" class="sidebar__group-label">Wilayah Asal</label>
+            <select id="region-filter" aria-label="Filter berdasarkan wilayah asal"></select>
+          </div>
+
+          <!-- Filter warna -->
+          <div class="sidebar__group">
+            <p class="sidebar__group-label" id="color-filter-label">Warna Dominan</p>
+            <div
+              id="color-swatches"
+              role="group"
+              aria-labelledby="color-filter-label"
+              aria-description="Klik swatch untuk filter koleksi berdasarkan warna. Setiap swatch memiliki pola tekstur berbeda untuk aksesibilitas."
+            ></div>
+          </div>
+
+          <!-- Tombol reset -->
+          <button class="btn-reset-filter" onclick="Explorer.resetFilters()" aria-label="Hapus semua filter aktif">
+            Hapus Semua Filter
+          </button>
+        </aside>
+
+        <!-- Main: grid + counter -->
+        <div>
+          <div class="explorer__top-bar">
+            <p id="results-count" aria-live="polite" aria-atomic="true"></p>
+            <div class="explorer__actions">
+              <button id="favorites-filter-btn" class="btn-ghost btn-small" type="button" hidden>
+                Favorit Saya
+              </button>
+            </div>
+          </div>
+          <div
+            id="batik-grid"
+            role="list"
+            aria-label="Daftar motif batik"
+          ></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== POPUPS & MODALS ===================== -->
+    <!-- Simulasi Buta Warna Popup -->
+    <aside id="colorblind-popup" class="colorblind-popup" role="dialog" aria-modal="true" aria-labelledby="cb-popup-title" hidden aria-hidden="true">
+      <button id="colorblind-popup-close" class="colorblind-popup__close" aria-label="Tutup mode aksesibilitas" type="button">×</button>
+      <div class="colorblind-popup__header">
+        <p class="cb-mode-group__title">Mode Aksesibilitas</p>
+        <h3 id="cb-popup-title" class="colorblind-popup__title">Simulasi Buta Warna</h3>
+        <p class="colorblind-popup__text">Klik tombol di bawah untuk melihat bagaimana tampilan batik berubah sesuai tipe buta warna.</p>
+      </div>
+      <div class="colorblind-popup__content">
+        <button class="cb-btn cb-btn--active" data-cb-mode="normal" aria-pressed="true" aria-label="Mode tampilan normal">
+          <span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #2ecc71 33% 66%, #3498db 66%);"></span>Normal
+        </button>
+        <button class="cb-btn" data-cb-mode="protanopia" aria-pressed="false" aria-label="Simulasi Protanopia — buta warna merah">
+          <span class="cb-btn__dot" style="background: linear-gradient(135deg, #808000 33%, #808000 33% 66%, #3498db 66%);"></span>Protanopia
+        </button>
+        <button class="cb-btn" data-cb-mode="deuteranopia" aria-pressed="false" aria-label="Simulasi Deuteranopia — buta warna hijau">
+          <span class="cb-btn__dot" style="background: linear-gradient(135deg, #c8a000 33%, #c8a000 33% 66%, #3498db 66%);"></span>Deuteranopia
+        </button>
+        <button class="cb-btn" data-cb-mode="tritanopia" aria-pressed="false" aria-label="Simulasi Tritanopia — buta warna biru">
+          <span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #00b0b0 33% 66%, #00b0b0 66%);"></span>Tritanopia
+        </button>
+        <p id="cb-status" class="colorblind-popup__status" aria-live="polite" aria-atomic="true">Mode tampilan: Normal</p>
+        <p id="cb-description" class="colorblind-popup__description">Tampilan normal tanpa simulasi buta warna.</p>
+      </div>
+    </aside>
+
+    <!-- Login Modal -->
+    <aside id="login-modal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden aria-hidden="true">
+      <button id="login-close-btn" class="login-modal__close" aria-label="Tutup login" type="button">×</button>
+      <div class="login-modal__header">
+        <h3 id="login-title">Masuk ke Akun</h3>
+        <p class="login-modal__text">Masuk untuk menyimpan motif favorit, membuat akun, atau akses panel admin jika Anda admin.</p>
+      </div>
+      <div class="login-mode-switch">
+        <button type="button" id="login-mode-btn" class="login-mode-btn login-mode-btn--active">Masuk</button>
+        <button type="button" id="register-mode-btn" class="login-mode-btn">Daftar</button>
+      </div>
+      <form id="login-form" class="login-form" autocomplete="off">
+        <label class="login-form__label">Nama Pengguna<input id="login-username" name="username" type="text" required autocomplete="username" /></label>
+        <label class="login-form__label">Kata Sandi<input id="login-password" name="password" type="password" required autocomplete="current-password" /></label>
+
+        <button id="auth-submit-btn" type="submit" class="btn-primary btn-full">Masuk</button>
+        <p id="auth-hint" class="login-form__note">Jika belum punya akun, daftar dulu.</p>
+      </form>
+      <button id="logout-button" class="btn-ghost btn-full" type="button" hidden>Keluar</button>
+      <p id="login-message" class="login-modal__message" aria-live="polite"></p>
+    </aside>
+
+    <!-- Admin Panel Modal -->
+    <aside id="admin-panel" class="admin-panel" role="dialog" aria-modal="true" aria-labelledby="admin-panel-title" hidden aria-hidden="true">
+      <button id="admin-panel-close" class="admin-panel__close" aria-label="Tutup panel admin" type="button">×</button>
+      <div class="admin-panel__header">
+        <h3 id="admin-panel-title">Panel Admin</h3>
+        <p class="admin-panel__text">Pilih motif yang sudah ada agar data terisi otomatis, atau pilih tambah motif baru.</p>
+      </div>
+      <form id="admin-form" class="admin-form" autocomplete="off">
+        <label class="admin-form__label">Pilih Data Batik<select id="admin-template" name="template"><option value="">Tambah motif baru</option></select></label>
+        <div class="admin-form__row">
+          <label class="admin-form__label">Nama Motif<input id="admin-name" name="name" type="text" required /></label>
+          <label class="admin-form__label">Asal Motif<input id="admin-origin" name="origin" type="text" required /></label>
+        </div>
+        <div class="admin-form__row">
+          <label class="admin-form__label">Abad<input id="admin-century" name="century" type="text" placeholder="XVI" required /></label>
+          <label class="admin-form__label">Wilayah<select id="admin-region" name="region" required></select></label>
+        </div>
+        <div class="admin-form__row">
+          <label class="admin-form__label">Path / URL Gambar<input id="admin-image-url" name="imageUrl" type="text" placeholder="img/..." /></label>
+          <label class="admin-form__label">Unggah Foto Utama<input id="admin-image-file" name="imageFile" type="file" accept="image/*" /></label>
+        </div>
+        <label class="admin-form__label">Foto Terkait (pisahkan koma)<input id="admin-samples" name="samples" type="text" placeholder="img/samples/..." /></label>
+        <label class="admin-form__label">Tambah Foto Terkait<input id="admin-sample-files" name="sampleFiles" type="file" accept="image/*" multiple /><span id="admin-sample-file-status" class="admin-form__hint">Belum ada foto terpilih.</span></label>
+        <div id="admin-sample-list" class="admin-sample-list"></div>
+        <div class="admin-form__row admin-form__preview-row">
+          <div class="admin-image-preview-wrap"><img id="admin-image-preview" class="admin-image-preview" src="" hidden /><span id="admin-image-placeholder">Pratinjau gambar utama.</span></div>
+        </div>
+        <label class="admin-form__label">Ciri Khas Motif<textarea id="admin-feature" name="feature" rows="3" required></textarea></label>
+        <label class="admin-form__label">Makna<textarea id="admin-meaning" name="meaning" rows="3" required></textarea></label>
+        <label class="admin-form__label">Deskripsi<textarea id="admin-description" name="description" rows="3" required></textarea></label>
+        <label class="admin-form__label">Warna Utama (pisahkan koma)<input id="admin-colors" name="colors" type="text" required /></label>
+        <label class="admin-form__label">Tag Subjek (pisahkan koma)<input id="admin-subjects" name="subjects" type="text" /></label>
+        <label class="admin-form__label">Nomor Inventaris<input id="admin-accession" name="accession" type="text" /></label>
+        <div style="display:flex; gap:10px;">
+          <button id="admin-submit-btn" type="submit" class="btn-primary btn-full">Tambah Motif</button>
+          <button id="admin-delete-btn" type="button" class="btn-primary btn-full" style="display:none; background-color:var(--burgundy-500);">Hapus Motif</button>
+        </div>
+      </form>
+      <p id="admin-message" class="admin-message" aria-live="polite"></p>
+    </aside>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer id="footer" role="contentinfo">
+      <div class="footer__inner">
+        <div>
+          <p class="footer__brand-name">Museum Digital Nasional Indonesia</p>
+          <p class="footer__brand-desc">
+            Galeri digital motif batik Nusantara — melestarikan warisan budaya bangsa untuk generasi mendatang melalui teknologi.
+          </p>
+        </div>
+        <div>
+          <p class="footer__col-title">Navigasi</p>
+          <ul class="footer__links">
+            <li><a href="index.html">Beranda</a></li>
+            <li><a href="about.html">Tentang Museum</a></li>
+            <li><a href="explorer.html">Koleksi Batik</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer__col-title">Teknologi AI</p>
+          <ul class="footer__links">
+            <li><a href="ai-center.html">Pusat Kecerdasan AI</a></li>
+            <li><a href="quiz.html">Kuis Interaktif</a></li>
+            <li><a href="dashboard.html">Dashboard Analisis</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span id="footer-year"></span> Museum Digital Nasional Indonesia. Keperluan edukasi & pelestarian budaya.</p>
+        <p>Dibuat dengan ❤️ untuk warisan budaya Nusantara</p>
+      </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="js/data.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/colorblind.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/similarity.js"></script>
+    <script src="js/explorer.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      document.getElementById("footer-year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <meta
+      name="description"
+      content="Pusat Kecerdesan AI Museum Batik Nusantara — Smart Search cerdas, Konsultasi Rekomendasi, Obrolan Kurator AI, dan Audio Guide Learning."
+    />
+    <title>AI Center — Museum Digital Nasional Indonesia</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/collection.css" />
+    <link rel="stylesheet" href="css/ai.css" />
+  </head>
+
+  <body class="dark-page">
+    <div id="page-veil" aria-hidden="true"></div>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav id="navbar" role="navigation" aria-label="Navigasi utama" class="navbar--scrolled">
+      <div class="navbar__inner">
+        <button
+          id="accessibility-toggle"
+          class="accessibility-toggle"
+          aria-label="Buka panel aksesibilitas"
+          aria-expanded="false"
+          aria-controls="colorblind-popup"
+          type="button"
+        >
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+        </button>
+
+        <a href="index.html" class="navbar__logo" aria-label="Museum Digital Nasional Indonesia — ke halaman utama">
+          <span class="navbar__logo-title">Museum Digital</span>
+          <span class="navbar__logo-sub">Nasional Indonesia</span>
+        </a>
+
+        <button
+          id="hamburger"
+          aria-label="Buka menu navigasi"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+          type="button"
+        >
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+        </button>
+
+        <div id="nav-menu" role="menubar">
+          <a href="index.html" class="nav-link" role="menuitem">Beranda</a>
+          <a href="about.html" class="nav-link" role="menuitem">Tentang</a>
+          <a href="explorer.html" class="nav-link" role="menuitem">Koleksi</a>
+          <a href="ai-center.html" class="nav-link nav-link--active" role="menuitem">AI Center</a>
+          <a href="quiz.html" class="nav-link" role="menuitem">Quiz AI</a>
+          <a href="dashboard.html" class="nav-link" role="menuitem">Dashboard</a>
+          <button id="admin-panel-button" class="nav-link nav-link--button btn-small" type="button" aria-label="Buka panel admin" hidden>Admin</button>
+          <button id="login-button" class="nav-link nav-link--button" type="button" aria-label="Masuk atau profil pengguna">Masuk</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===================== AI CENTER HERO ===================== -->
+    <header class="ai-header-section">
+      <h1>Pusat Kecerdasan AI</h1>
+      <p>Jelajahi kekayaan warisan batik Indonesia secara interaktif didukung teknologi Artificial Intelligence terdepan.</p>
+    </header>
+
+    <!-- ===================== API WIDGET CONTAINER ===================== -->
+    <div id="api-key-widget-container" style="padding: 0 2rem;"></div>
+
+    <!-- ===================== SUB NAVIGASI MENU AI ===================== -->
+    <div class="ai-nav-tabs-wrap" style="max-width: var(--max-width); margin: 0 auto 30px; padding: 0 2rem;">
+      <div class="modal-tabs" role="tablist" aria-label="Navigasi Menu AI" style="justify-content: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
+        <button class="modal-tab modal-tab--active" role="tab" aria-selected="true" data-ai-tab="search">🔍 Smart Search</button>
+        <button class="modal-tab" role="tab" aria-selected="false" data-ai-tab="recommendation">👔 Rekomendasi AI</button>
+        <button class="modal-tab" role="tab" aria-selected="false" data-ai-tab="curator">💬 AI Curator Chat</button>
+        <button class="modal-tab" role="tab" aria-selected="false" data-ai-tab="learning">📖 AI Learning</button>
+      </div>
+    </div>
+
+    <!-- ===================== KONTEN FITUR AI ===================== -->
+    <main style="max-width: var(--max-width); margin: 0 auto 80px; padding: 0 2rem;">
+      
+      <!-- 1. AI Smart Search -->
+      <section id="sec-ai-search" class="ai-tab-panel">
+        <div class="glass-card text-center" style="margin-bottom: 30px;">
+          <h3 class="ai-card__title">Pencarian Bahasa Alami Cerdas</h3>
+          <p class="ai-card__desc">Cari batik berdasarkan rasa, warna, asal daerah, atau filosofinya dalam kalimat percakapan sehari-hari.</p>
+          <div class="smart-search-box">
+            <input id="smart-search-input" type="text" class="form-input" placeholder="Tulis misal: Saya mencari batik biru lambang kesabaran untuk acara resmi..." />
+            <button id="smart-search-btn" class="btn-primary">Cari Cerdas</button>
+          </div>
+        </div>
+
+        <div id="smart-search-results-area" style="display: none;">
+          <h3 class="section-title" style="font-size: 1.5rem; text-align: left; margin-bottom: 20px;">Hasil Analisis Pencarian AI</h3>
+          <div id="smart-search-results-grid" class="search-results-grid"></div>
+        </div>
+      </section>
+
+      <!-- 2. AI Recommendation -->
+      <section id="sec-ai-recommendation" class="ai-tab-panel" style="display: none;">
+        <div class="glass-card">
+          <h3 class="ai-card__title text-center">Konsultasi Rekomendasi Batik</h3>
+          <p class="ai-card__desc text-center" style="margin-bottom: 30px;">Isi preferensi kuesioner Anda untuk mendapatkan rekomendasi busana batik terbaik beserta alasan adat-budayanya.</p>
+          
+          <form id="recommendation-form" class="recommendation-wizard" autocomplete="off">
+            <div class="form-grid">
+              <div class="form-label-group">
+                <label for="rec-acara">Tujuan Acara</label>
+                <select id="rec-acara" class="form-select">
+                  <option value="wisuda">Wisuda / Kelulusan</option>
+                  <option value="pernikahan">Pernikahan / Kondangan</option>
+                  <option value="rapat formal">Rapat Resmi / Formal Kantor</option>
+                  <option value="santai">Kasual / Santai Harian</option>
+                </select>
+              </div>
+
+              <div class="form-label-group">
+                <label for="rec-budget">Anggaran Pembelian</label>
+                <select id="rec-budget" class="form-select">
+                  <option value="low">Terjangkau (di bawah Rp 500.000)</option>
+                  <option value="medium">Menengah (Rp 500.000 - Rp 1.500.000)</option>
+                  <option value="high">Premium (di atas Rp 1.500.000)</option>
+                </select>
+              </div>
+
+              <div class="form-label-group">
+                <label for="rec-warna">Warna Dominan</label>
+                <select id="rec-warna" class="form-select">
+                  <option value="all">Bebas / Semua Warna</option>
+                  <option value="Merah">Merah</option>
+                  <option value="Biru">Biru</option>
+                  <option value="Coklat">Cokelat</option>
+                  <option value="Hitam">Hitam</option>
+                  <option value="Kuning/Emas">Emas / Kuning</option>
+                  <option value="Hijau">Hijau</option>
+                  <option value="Putih/Krem">Putih / Krem</option>
+                </select>
+              </div>
+
+              <div class="form-label-group">
+                <label for="rec-motif">Corak Ornamen</label>
+                <select id="rec-motif" class="form-select">
+                  <option value="all">Bebas</option>
+                  <option value="geometris">Geometris / Simetris</option>
+                  <option value="flora">Flora / Tumbuhan</option>
+                  <option value="fauna">Fauna / Hewan</option>
+                  <option value="awan/ombak">Awan atau Ombak</option>
+                </select>
+              </div>
+
+              <div class="form-label-group">
+                <label for="rec-daerah">Daerah Asal</label>
+                <select id="rec-daerah" class="form-select">
+                  <option value="all">Semua Wilayah</option>
+                  <option value="jawa-barat">Jawa Barat</option>
+                  <option value="jawa-tengah">Jawa Tengah</option>
+                  <option value="yogyakarta">DI Yogyakarta</option>
+                  <option value="sumatera">Sumatera</option>
+                  <option value="kalimantan">Kalimantan</option>
+                </select>
+              </div>
+
+              <div class="form-label-group">
+                <label for="rec-kategori">Klasifikasi Budaya</label>
+                <select id="rec-kategori" class="form-select">
+                  <option value="all">Bebas</option>
+                  <option value="keraton">Batik Keraton (Klasik/Filosofis)</option>
+                  <option value="pesisir">Batik Pesisir (Dinamis/Modern)</option>
+                </select>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn-primary btn-full">Dapatkan Rekomendasi Cerdas</button>
+          </form>
+        </div>
+
+        <div id="recommendation-results-area" style="display: none; margin-top: 40px;">
+          <h3 class="section-title" style="font-size: 1.5rem; text-align: left; margin-bottom: 20px;">Rekomendasi Teratas Hasil Analisis AI</h3>
+          <div id="recommendation-results-grid" class="search-results-grid"></div>
+        </div>
+      </section>
+
+      <!-- 3. AI Curator Chat -->
+      <section id="sec-ai-curator" class="ai-tab-panel" style="display: none;">
+        <div class="curator-chat-window glass-card">
+          <!-- Chat messages stream -->
+          <div id="curator-messages" class="curator-messages"></div>
+          
+          <!-- Quick suggestions -->
+          <div id="curator-quick-questions" class="curator-quick-questions"></div>
+
+          <!-- Input bar -->
+          <div class="curator-chat-input-bar">
+            <textarea id="curator-input" placeholder="Tanya Ki Kurator mengenai filosofi Parang, makna Kawung, atau tips merawat batik tulis..." rows="1"></textarea>
+            <button id="curator-send-btn" class="btn-primary">Kirim</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. AI Learning & Audio Guide -->
+      <section id="sec-ai-learning" class="ai-tab-panel" style="display: none;">
+        <div class="glass-card text-center" style="margin-bottom: 30px; padding: 1.5rem;">
+          <div style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
+            <label for="learning-batik-select" style="font-weight: bold; color: var(--gold-400);">Pilih Motif yang Ingin Dipelajari:</label>
+            <select id="learning-batik-select" class="form-select" style="padding: 0.5rem 1rem;"></select>
+          </div>
+        </div>
+
+        <div id="learning-content-area"></div>
+      </section>
+
+    </main>
+
+    <!-- ===================== POPUPS & MODALS ===================== -->
+    <!-- simulasi buta warna -->
+    <aside id="colorblind-popup" class="colorblind-popup" role="dialog" aria-modal="true" aria-labelledby="cb-popup-title" hidden aria-hidden="true">
+      <button id="colorblind-popup-close" class="colorblind-popup__close" aria-label="Tutup mode aksesibilitas" type="button">×</button>
+      <div class="colorblind-popup__header">
+        <p class="cb-mode-group__title">Mode Aksesibilitas</p>
+        <h3 id="cb-popup-title" class="colorblind-popup__title">Simulasi Buta Warna</h3>
+        <p class="colorblind-popup__text">Pilih tipe simulasi buta warna di bawah ini.</p>
+      </div>
+      <div class="colorblind-popup__content">
+        <button class="cb-btn cb-btn--active" data-cb-mode="normal" aria-pressed="true" aria-label="Mode normal"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #2ecc71 33% 66%, #3498db 66%);"></span>Normal</button>
+        <button class="cb-btn" data-cb-mode="protanopia" aria-pressed="false" aria-label="Simulasi Protanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #808000 33%, #808000 33% 66%, #3498db 66%);"></span>Protanopia</button>
+        <button class="cb-btn" data-cb-mode="deuteranopia" aria-pressed="false" aria-label="Simulasi Deuteranopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #c8a000 33%, #c8a000 33% 66%, #3498db 66%);"></span>Deuteranopia</button>
+        <button class="cb-btn" data-cb-mode="tritanopia" aria-pressed="false" aria-label="Simulasi Tritanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #00b0b0 33% 66%, #00b0b0 66%);"></span>Tritanopia</button>
+      </div>
+    </aside>
+
+    <!-- Login Modal -->
+    <aside id="login-modal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden aria-hidden="true">
+      <button id="login-close-btn" class="login-modal__close" aria-label="Tutup login" type="button">×</button>
+      <div class="login-modal__header">
+        <h3 id="login-title">Masuk ke Akun</h3>
+        <p class="login-modal__text">Masuk untuk menyimpan motif favorit, membuat akun, atau akses panel admin jika Anda admin.</p>
+      </div>
+      <div class="login-mode-switch">
+        <button type="button" id="login-mode-btn" class="login-mode-btn login-mode-btn--active">Masuk</button>
+        <button type="button" id="register-mode-btn" class="login-mode-btn">Daftar</button>
+      </div>
+      <form id="login-form" class="login-form" autocomplete="off">
+        <label class="login-form__label">
+          Nama Pengguna
+          <input id="login-username" name="username" type="text" required autocomplete="username" />
+        </label>
+        <label class="login-form__label">
+          Kata Sandi
+          <input id="login-password" name="password" type="password" required autocomplete="current-password" />
+        </label>
+
+        <button id="auth-submit-btn" type="submit" class="btn-primary btn-full">Masuk</button>
+        <p id="auth-hint" class="login-form__note">Jika belum punya akun, daftar dulu.</p>
+      </form>
+      <button id="logout-button" class="btn-ghost btn-full" type="button" hidden>Keluar</button>
+      <p id="login-message" class="login-modal__message" aria-live="polite"></p>
+    </aside>
+
+    <!-- Footer -->
+    <footer id="footer" role="contentinfo">
+      <div class="footer__inner">
+        <div>
+          <p class="footer__brand-name">Museum Digital Nasional Indonesia</p>
+          <p class="footer__brand-desc">Melestarikan batik Nusantara untuk generasi mendatang melalui teknologi.</p>
+        </div>
+        <div>
+          <p class="footer__col-title">Navigasi</p>
+          <ul class="footer__links">
+            <li><a href="index.html">Beranda</a></li>
+            <li><a href="about.html">Tentang</a></li>
+            <li><a href="explorer.html">Koleksi</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span id="footer-year"></span> Museum Digital Nasional Indonesia.</p>
+      </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="js/data.js"></script>
+    <script src="api/gemini.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/colorblind.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/similarity.js"></script>
+    
+    <script src="js/smartsearch.js"></script>
+    <script src="js/recommendation.js"></script>
+    <script src="js/curator.js"></script>
+    <script src="js/learning.js"></script>
+    
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Tab Switching logic for AI Center -->
+    <script>
+      document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+      // Initialize Gemini Widget
+      if (window.GeminiAPI) {
+        window.GeminiAPI.createApiKeyWidget("api-key-widget-container", (hasKey) => {
+          console.log("Kondisi API Key Gemini berubah:", hasKey);
+          // Reload AI features to take advantage of new key
+          if (window.Curator) Curator.init();
+          if (window.Learning) {
+            const currentVal = document.getElementById("learning-batik-select")?.value;
+            if (currentVal) Learning.loadBatikLearning(currentVal);
+          }
+        });
+      }
+
+      // Tab Switching
+      document.querySelectorAll("[data-ai-tab]").forEach(tabBtn => {
+        tabBtn.addEventListener("click", () => {
+          // Deactivate tabs
+          document.querySelectorAll("[data-ai-tab]").forEach(btn => {
+            btn.classList.remove("modal-tab--active");
+            btn.setAttribute("aria-selected", "false");
+          });
+          // Activate clicked tab
+          tabBtn.classList.add("modal-tab--active");
+          tabBtn.setAttribute("aria-selected", "true");
+
+          // Hide panels
+          document.querySelectorAll(".ai-tab-panel").forEach(panel => {
+            panel.style.display = "none";
+          });
+          // Show active panel
+          const activeTab = tabBtn.dataset.aiTab;
+          if (activeTab === "search") {
+            document.getElementById("sec-ai-search").style.display = "block";
+          } else if (activeTab === "recommendation") {
+            document.getElementById("sec-ai-recommendation").style.display = "block";
+          } else if (activeTab === "curator") {
+            document.getElementById("sec-ai-curator").style.display = "block";
+            if (window.Curator) Curator.init();
+          } else if (activeTab === "learning") {
+            document.getElementById("sec-ai-learning").style.display = "block";
+            if (window.Learning) Learning.init();
+          }
+        });
+      });
+
+      // Bind Smart Search
+      const searchBtn = document.getElementById("smart-search-btn");
+      const searchInput = document.getElementById("smart-search-input");
+      const searchResultsArea = document.getElementById("smart-search-results-area");
+      const searchResultsGrid = document.getElementById("smart-search-results-grid");
+
+      if (searchBtn && searchInput) {
+        searchBtn.addEventListener("click", async () => {
+          const query = searchInput.value.trim();
+          if (!query || !window.SmartSearch) return;
+
+          searchBtn.disabled = true;
+          searchBtn.textContent = "Menganalisis...";
+          searchResultsGrid.innerHTML = `<div class="text-center" style="grid-column: 1/-1; padding: 2rem;"><div class="typing-indicator"><span></span><span></span><span></span></div><p style="margin-top: 10px;">AI sedang menganalisis kecocokan batik...</p></div>`;
+          searchResultsArea.style.display = "block";
+
+          try {
+            const results = await window.SmartSearch.search(query);
+            renderSearchResults(results);
+          } catch (err) {
+            searchResultsGrid.innerHTML = `<p style="grid-column: 1/-1; color: #EF4444; text-align: center;">Gagal memproses pencarian: ${err.message}</p>`;
+          } finally {
+            searchBtn.disabled = false;
+            searchBtn.textContent = "Cari Cerdas";
+          }
+        });
+      }
+
+      function renderSearchResults(results) {
+        if (!results || results.length === 0) {
+          searchResultsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-light-muted); padding: 2rem;">Maaf, AI tidak menemukan batik yang cocok dengan query Anda. Coba tulis dengan kata kunci lain.</p>`;
+          return;
+        }
+
+        const data = window.BATIK_DATA || [];
+        searchResultsGrid.innerHTML = results.map(res => {
+          const batik = data.find(b => b.id === res.id);
+          if (!batik) return "";
+
+          return `
+            <div class="search-result-card glass-card" style="padding: 0;">
+              <div class="search-result-card__match">${res.score}% Cocok</div>
+              <div class="search-result-card__body">
+                <span style="font-size: 24px;">${batik.emoji}</span>
+                <h4 class="search-result-card__title">${batik.nama}</h4>
+                <p style="font-size: 0.82rem; color: var(--gold-200);">${batik.asal}</p>
+                <p class="search-result-card__reason">${res.reason}</p>
+                <button class="btn-ghost btn-small btn-full" style="margin-top: 15px;" onclick="Modal.open('${batik.id}')">Lihat Detail Motif</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Bind Recommendation Form
+      const recForm = document.getElementById("recommendation-form");
+      const recResultsArea = document.getElementById("recommendation-results-area");
+      const recResultsGrid = document.getElementById("recommendation-results-grid");
+
+      if (recForm) {
+        recForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (!window.Recommendation) return;
+
+          const submitBtn = recForm.querySelector("button[type=submit]");
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Menghitung...";
+
+          recResultsGrid.innerHTML = `<div class="text-center" style="grid-column: 1/-1; padding: 2rem;"><div class="typing-indicator"><span></span><span></span><span></span></div><p style="margin-top: 10px;">AI sedang menganalisis kuesioner Anda...</p></div>`;
+          recResultsArea.style.display = "block";
+
+          const inputs = {
+            acara: document.getElementById("rec-acara").value,
+            budget: document.getElementById("rec-budget").value,
+            warna: document.getElementById("rec-warna").value,
+            motif: document.getElementById("rec-motif").value,
+            daerah: document.getElementById("rec-daerah").value,
+            kategori: document.getElementById("rec-kategori").value
+          };
+
+          try {
+            const results = await window.Recommendation.getRecommendations(inputs);
+            renderRecResults(results);
+          } catch (err) {
+            recResultsGrid.innerHTML = `<p style="grid-column: 1/-1; color: #EF4444; text-align: center;">Gagal memproses rekomendasi: ${err.message}</p>`;
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Dapatkan Rekomendasi Cerdas";
+          }
+        });
+      }
+
+      function renderRecResults(results) {
+        if (!results || results.length === 0) {
+          recResultsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-light-muted); padding: 2rem;">Tidak ada rekomendasi batik yang cocok.</p>`;
+          return;
+        }
+
+        const data = window.BATIK_DATA || [];
+        recResultsGrid.innerHTML = results.slice(0, 3).map(res => {
+          const batik = data.find(b => b.id === res.id);
+          if (!batik) return "";
+
+          return `
+            <div class="search-result-card glass-card" style="padding: 0;">
+              <div class="search-result-card__match" style="background-color: #3B82F6; color: white;">${res.score}% Cocok</div>
+              <div class="search-result-card__body">
+                <span style="font-size: 24px;">${batik.emoji}</span>
+                <h4 class="search-result-card__title">${batik.nama}</h4>
+                <p style="font-size: 0.82rem; color: var(--gold-200);">${batik.asal}</p>
+                <p class="search-result-card__reason" style="border-left-color: #3B82F6;">${res.reason}</p>
+                <button class="btn-ghost btn-small btn-full" style="margin-top: 15px;" onclick="Modal.open('${batik.id}')">Lihat Detail Motif</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    </script>
+  </body>
+</html>

@@ -8,6 +8,7 @@ const Modal = (() => {
   let modalEl = null;
   let modalOverlay = null;
   let lastFocusedEl = null;
+  let currentMotifId = null;
 
   function init() {
     modalEl      = document.getElementById("motif-modal");
@@ -76,6 +77,7 @@ const Modal = (() => {
               <button class="modal-tab modal-tab--active" role="tab" aria-selected="true"  data-tab="detail">Detail</button>
               <button class="modal-tab"                   role="tab" aria-selected="false" data-tab="metadata">Metadata</button>
               <button class="modal-tab"                   role="tab" aria-selected="false" data-tab="galeri">Galeri</button>
+              <button class="modal-tab"                   role="tab" aria-selected="false" data-tab="forum">Forum Saran</button>
             </div>
 
             <!-- Panel: Detail -->
@@ -95,6 +97,10 @@ const Modal = (() => {
             <div id="modal-detail-gallery-section" class="modal-section">
               <h3 class="modal-section-title"><span class="modal-section-icon" aria-hidden="true">◌</span>Foto Terkait</h3>
               <div id="modal-detail-gallery" class="modal-gallery modal-gallery--inline" role="list" aria-label="Foto-foto terkait motif"></div>
+            </div>
+            <div id="modal-similar-section" class="modal-section">
+              <h3 class="modal-section-title"><span class="modal-section-icon" aria-hidden="true">💎</span>Koleksi Serupa (AI Recommendation)</h3>
+              <div id="modal-similar-list" class="modal-similar-list" role="list" aria-label="Koleksi motif serupa"></div>
             </div>
               <table class="cidoc-table" aria-label="Metadata CIDOC-CRM objek">
                 <tbody>
@@ -130,6 +136,23 @@ const Modal = (() => {
               <span id="modal-contributor-badge" class="modal-contributor-badge"></span>
             </div>
 
+            <!-- Panel: Forum -->
+            <div class="modal-tab-panel modal-tab-panel--hidden" data-panel="forum">
+              <div class="forum-container">
+                <div id="forum-comments-list" class="forum-comments-list" aria-live="polite"></div>
+                
+                <div id="forum-auth-prompt" class="forum-auth-prompt" style="display:none; text-align:center; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 15px;">
+                  <p style="margin-bottom: 10px;">Silakan masuk (login) untuk ikut memberikan saran atau kesan.</p>
+                  <button id="btn-forum-login" class="btn-primary btn-small">Masuk / Daftar</button>
+                </div>
+                
+                <form id="forum-comment-form" class="forum-comment-form" style="display:none; margin-top: 20px; display:flex; flex-direction:column; gap:10px;">
+                  <textarea id="forum-comment-text" class="form-input" placeholder="Tulis saran atau kesan Anda..." required rows="3" style="resize:vertical;"></textarea>
+                  <button type="submit" class="btn-primary" style="align-self:flex-end;">Kirim Saran</button>
+                </form>
+              </div>
+            </div>
+
           </div><!-- /modal-content-col -->
         </div><!-- /modal-layout -->
       </div><!-- /modal-inner -->
@@ -156,6 +179,48 @@ const Modal = (() => {
       if (e.key === "Escape" && isOpen()) close();
     });
 
+    // Forum event bindings
+    const forumForm = document.getElementById("forum-comment-form");
+    if (forumForm) {
+      forumForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const textInput = document.getElementById("forum-comment-text");
+        const text = textInput.value.trim();
+        if (!text || !currentMotifId) return;
+        
+        const currentUser = window.Auth?.getCurrentUser();
+        if (!currentUser) return;
+        
+        const comments = JSON.parse(localStorage.getItem("museum_comments") || "[]");
+        comments.push({
+          id: "cmt_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+          batikId: currentMotifId,
+          username: currentUser.username,
+          text: text,
+          date: new Date().toISOString()
+        });
+        localStorage.setItem("museum_comments", JSON.stringify(comments));
+        
+        textInput.value = "";
+        renderForum();
+      });
+    }
+
+    const btnForumLogin = document.getElementById("btn-forum-login");
+    if (btnForumLogin) {
+      btnForumLogin.addEventListener("click", () => {
+        const loginBtn = document.getElementById("login-button");
+        if (loginBtn) loginBtn.click();
+      });
+    }
+
+    // Dengarkan perubahan login untuk merender ulang forum jika modal terbuka
+    window.addEventListener("authStateChanged", () => {
+      if (isOpen() && currentMotifId) {
+        renderForum();
+      }
+    });
+
     // Tab switching
     document.addEventListener("click", (e) => {
       const tab = e.target.closest(".modal-tab");
@@ -180,8 +245,10 @@ const Modal = (() => {
     const motif = window.BATIK_DATA?.find((m) => m.id === motifId);
     if (!motif || !modalOverlay || !modalEl) return;
 
+    currentMotifId = motifId;
     lastFocusedEl = document.activeElement;
     populateModal(motif);
+    renderForum();
 
     modalOverlay.classList.add("modal-overlay--open");
     modalEl.classList.add("motif-modal--open");
@@ -204,6 +271,7 @@ const Modal = (() => {
     document.body.classList.remove("body--modal-open");
     lastFocusedEl?.focus();
     lastFocusedEl = null;
+    currentMotifId = null;
   }
 
   function isOpen() {
@@ -326,6 +394,31 @@ const Modal = (() => {
       }
     }
 
+    // Render Koleksi Serupa (Similar Collection)
+    const similarContainer = document.getElementById("modal-similar-list");
+    if (similarContainer && window.Similarity) {
+      const similarItems = window.Similarity.getSimilarItems(motif.id);
+      similarContainer.innerHTML = similarItems.map(item => `
+        <button class="similar-item-card" type="button" data-id="${item.batik.id}" aria-label="Lihat batik serupa ${item.batik.nama}">
+          <img src="${item.batik.image}" alt="Batik ${item.batik.nama}" class="similar-item-card__img" />
+          <div class="similar-item-card__info">
+            <p class="similar-item-card__name">${item.batik.nama}</p>
+            <span class="similar-item-card__match">${item.score}% mirip</span>
+          </div>
+        </button>
+      `).join("");
+
+      similarContainer.querySelectorAll(".similar-item-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const targetId = card.dataset.id;
+          if (targetId) {
+            open(targetId);
+          }
+        });
+      });
+    }
+
     // Reset ke tab pertama
     document.querySelectorAll(".modal-tab").forEach((t, i) => {
       t.classList.toggle("modal-tab--active", i === 0);
@@ -334,6 +427,62 @@ const Modal = (() => {
     document.querySelectorAll(".modal-tab-panel").forEach((p, i) => {
       p.classList.toggle("modal-tab-panel--hidden", i !== 0);
     });
+  }
+
+  // ── Forum / Comments ─────────────────────────────────────────────────────
+  function renderForum() {
+    const listContainer = document.getElementById("forum-comments-list");
+    const authPrompt = document.getElementById("forum-auth-prompt");
+    const commentForm = document.getElementById("forum-comment-form");
+    
+    if (!listContainer || !currentMotifId) return;
+
+    const currentUser = window.Auth?.getCurrentUser();
+    const isAdmin = currentUser?.isAdmin;
+    
+    if (currentUser) {
+      authPrompt.style.display = "none";
+      commentForm.style.display = "flex";
+    } else {
+      authPrompt.style.display = "block";
+      commentForm.style.display = "none";
+    }
+
+    const allComments = JSON.parse(localStorage.getItem("museum_comments") || "[]");
+    const motifComments = allComments.filter(c => c.batikId === currentMotifId);
+
+    if (motifComments.length === 0) {
+      listContainer.innerHTML = '<p style="color:var(--navy-300); font-style:italic;">Belum ada saran atau diskusi untuk koleksi ini. Jadilah yang pertama!</p>';
+    } else {
+      listContainer.innerHTML = motifComments.map(c => `
+        <div class="forum-comment" style="padding: 12px; background: rgba(0,0,0,0.03); border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--gold-500); position: relative;">
+          <strong style="color: var(--navy-800); display:block; margin-bottom:4px;">${c.username}</strong>
+          <p style="margin: 0; font-size: 0.95rem;">${c.text}</p>
+          <span style="font-size: 0.75rem; color: var(--navy-400); display:block; margin-top:6px;">
+            ${new Date(c.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' })}
+          </span>
+          ${isAdmin ? `<button class="btn-delete-comment" data-id="${c.id}" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: #dc3545; cursor: pointer; font-size: 1.1rem;" title="Hapus Saran (Admin)">🗑️</button>` : ""}
+        </div>
+      `).join('');
+
+      // Bind delete events for admin
+      if (isAdmin) {
+        listContainer.querySelectorAll('.btn-delete-comment').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const commentId = e.target.dataset.id;
+            deleteComment(commentId);
+          });
+        });
+      }
+    }
+  }
+
+  function deleteComment(id) {
+    if (!confirm("Admin: Anda yakin ingin menghapus saran ini?")) return;
+    let allComments = JSON.parse(localStorage.getItem("museum_comments") || "[]");
+    allComments = allComments.filter(c => c.id !== id);
+    localStorage.setItem("museum_comments", JSON.stringify(allComments));
+    renderForum();
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

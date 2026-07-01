@@ -19,7 +19,15 @@ const Nav = (() => {
     setupScrollBehavior();
     setupHamburger();
     setupNavLinks();
+    setupLinkInterceptor(); // Interseptor klik
     setupKeyboardNav();
+    
+    // Log page view globally if Auth is loaded
+    setTimeout(() => {
+      if (window.Auth && window.Auth.logActivity) {
+        window.Auth.logActivity("navigasi", `Membuka halaman ${document.title}`);
+      }
+    }, 1500); // Tunda sedikit agar Auth init selesai terlebih dahulu
   }
 
   // Navbar: transparan saat di atas, solid saat scroll
@@ -102,6 +110,25 @@ const Nav = (() => {
         behavior: "smooth",
       });
     }
+  }
+
+  // Intercept all links to guarantee activity logging before navigation
+  function setupLinkInterceptor() {
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest("a");
+      if (!link) return;
+      
+      const href = link.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("javascript:") || link.target === "_blank") return;
+
+      if (window.Auth && window.Auth.logActivity) {
+        e.preventDefault();
+        window.Auth.logActivity("navigasi", `Beralih ke: ${href}`);
+        setTimeout(() => {
+          window.location.href = href;
+        }, 150); // Beri waktu 150ms agar LocalStorage tersimpan sempurna
+      }
+    });
   }
 
   // Page veil animation — dipakai oleh modul lain

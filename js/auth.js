@@ -4,6 +4,15 @@
  * Museum Digital Nasional Indonesia
  */
 
+// Memuat Library EmailJS Secara Dinamis agar tidak perlu mengubah semua HTML
+(function loadEmailJS() {
+  if (document.getElementById("emailjs-script")) return;
+  const script = document.createElement("script");
+  script.id = "emailjs-script";
+  script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
+  document.head.appendChild(script);
+})();
+
 const Auth = (() => {
     let loginButton = null;
   let loginModal = null;
@@ -15,7 +24,6 @@ const Auth = (() => {
   let adminPanelButton = null;
   let loginModeBtn = null;
   let registerModeBtn = null;
-  let confirmPasswordRow = null;
   let authSubmitBtn = null;
   let authHint = null;
   let currentUser = null;
@@ -43,7 +51,6 @@ const Auth = (() => {
     adminPanelButton = document.getElementById("admin-panel-button");
     loginModeBtn = document.getElementById("login-mode-btn");
     registerModeBtn = document.getElementById("register-mode-btn");
-    confirmPasswordRow = document.getElementById("confirm-password-row");
     authSubmitBtn = document.getElementById("auth-submit-btn");
     authHint = document.getElementById("auth-hint");
 
@@ -76,10 +83,8 @@ const Auth = (() => {
         e.preventDefault();
         const usernameInput = document.getElementById("login-username");
         const passwordInput = document.getElementById("login-password");
-        const confirmInput = document.getElementById("login-confirm-password");
         const username = usernameInput?.value.trim();
         const password = passwordInput?.value;
-        const confirmPassword = confirmInput?.value;
 
         if (!username || !password) {
           showMessage("Mohon isi nama pengguna dan kata sandi.");
@@ -87,7 +92,7 @@ const Auth = (() => {
         }
 
         if (authMode === "register") {
-          registerUser(username, password, confirmPassword);
+          registerUser(username, password);
           return;
         }
 
@@ -171,33 +176,87 @@ const Auth = (() => {
       isAdmin: !!user.isAdmin,
     };
     saveSession();
+    logActivity("auth", `Berhasil masuk (login)`);
     showMessage(`Berhasil masuk sebagai ${username}.`);
     updateUI();
     dispatchAuthEvent();
     setTimeout(closeLoginModal, 900);
   }
 
-  function registerUser(username, password, confirmPassword) {
-    if (!confirmPassword) {
-      showMessage("Mohon konfirmasi kata sandi.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      showMessage("Kata sandi dan konfirmasi harus sama.");
-      return;
-    }
+  function registerUser(username, password) {
     if (findUser(username)) {
       showMessage("Nama pengguna sudah digunakan. Gunakan nama lain.");
       return;
     }
+    
+    const emailInput = document.getElementById("login-email");
+    const email = emailInput ? emailInput.value.trim() : "";
+    
+    // Bypass instan jika tidak ada email
+    if (!email) {
+      userStore.push({ username, password, email: "", favorites: [], isAdmin: false });
+      saveUserStore();
+      logActivity("auth", `Akun baru terdaftar (tanpa Gmail): @${username}`);
+      showMessage(`Akun ${username} berhasil dibuat. Masuk...`);
+      setTimeout(() => signIn(username, password), 600);
+      return;
+    }
 
-    userStore.push({ username, password, favorites: [], isAdmin: false });
-    saveUserStore();
-    showMessage(`Akun ${username} berhasil dibuat. Masuk...`);
-    setTimeout(() => signIn(username, password), 600);
+    if (!email.endsWith("@gmail.com")) {
+      showMessage("Format salah: Gunakan akhiran @gmail.com atau kosongkan saja.");
+      return;
+    }
+
+    // Integrasi EmailJS Asli (Membutuhkan konfigurasi)
+    const EMAILJS_PUBLIC_KEY = "5qfBhOCYwo17vqz4f";
+    const EMAILJS_SERVICE = "service_krkyr7u";
+    const EMAILJS_TEMPLATE = "template_1f851cr";
+
+    const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // Fallback jika belum dikonfigurasi (Senyap Tanpa Alert)
+    if (EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY_HERE") {
+      console.log(`[PEMBERITAHUAN SISTEM] EmailJS belum dikonfigurasi. Menggunakan auto-bypass OTP (Simulasi Senyap). OTP = ${randomOtp}`);
+      userStore.push({ username, password, email, favorites: [], isAdmin: false });
+      saveUserStore();
+      logActivity("auth", `Akun baru terdaftar (Auto-Bypass): @${username}`);
+      showMessage(`Akun ${username} berhasil dibuat. Masuk...`);
+      setTimeout(() => signIn(username, password), 600);
+      return;
+    }
+
+    // Jika EmailJS sudah dikonfigurasi, gunakan jaringan nyata untuk mengirim:
+    if (typeof emailjs !== "undefined") {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+      showMessage("Sedang mengirimkan email OTP...");
+      emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+        to_email: email,
+        to_name: username,
+        otp_code: randomOtp
+      }).then(() => {
+        const otp = window.prompt(`Kode verifikasi NYATA telah berhasil dikirim ke ${email}. Masukkan 4 angka OTP:`);
+        if (otp !== randomOtp) {
+          showMessage("Kode OTP salah atau dibatalkan.");
+          return;
+        }
+        userStore.push({ username, password, email, favorites: [], isAdmin: false });
+        saveUserStore();
+        logActivity("auth", `Akun baru terdaftar: @${username}`);
+        showMessage(`Akun ${username} berhasil dibuat. Masuk...`);
+        setTimeout(() => signIn(username, password), 600);
+      }).catch(err => {
+        console.error("Gagal mengirim email:", err);
+        let errText = "Kegagalan jaringan pengiriman email.";
+        if (err && err.text) errText = err.text;
+        showMessage("Gagal: " + errText + " (Cek konsol/Template ID)");
+      });
+    } else {
+      showMessage("Sistem EmailJS sedang memuat. Coba lagi dalam 2 detik.");
+    }
   }
 
   function signOut() {
+    logActivity("auth", `Keluar dari akun (logout)`);
     currentUser = null;
     showFavoritesOnly = false;
     saveSession();
@@ -208,6 +267,19 @@ const Auth = (() => {
 
   function openLoginModal() {
     if (!loginModal) return;
+    
+    // Inject Email Field dynamically if it doesn't exist
+    if (!document.getElementById("login-email-group")) {
+      const formLabelGroup = document.createElement("label");
+      formLabelGroup.className = "login-form__label";
+      formLabelGroup.id = "login-email-group";
+      formLabelGroup.style.display = "none"; // Sembunyikan secara default
+      formLabelGroup.innerHTML = `Email (Gmail)<input id="login-email" name="email" type="email" placeholder="contoh@gmail.com" autocomplete="email" />`;
+      if (loginForm) {
+        loginForm.insertBefore(formLabelGroup, loginForm.children[1]); // Letakkan di bawah Username
+      }
+    }
+
     loginModal.hidden = false;
     loginModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("body--menu-open");
@@ -305,16 +377,21 @@ const Auth = (() => {
 
   function setAuthMode(mode) {
     authMode = mode;
-    if (!loginModeBtn || !registerModeBtn || !confirmPasswordRow || !authSubmitBtn || !authHint) return;
+    const emailGroup = document.getElementById("login-email-group");
 
-    loginModeBtn.classList.toggle("login-mode-btn--active", mode === "login");
-    registerModeBtn.classList.toggle("login-mode-btn--active", mode === "register");
-    confirmPasswordRow.hidden = mode !== "register";
-    authSubmitBtn.textContent = mode === "login" ? "Masuk" : "Daftar";
-    authHint.textContent =
-      mode === "login"
-        ? "Jika belum punya akun, daftar dulu."
-        : "Buat akun baru untuk menyimpan favorit dan mengakses admin jika diizinkan.";
+    if (mode === "register") {
+      loginModeBtn?.classList.remove("login-mode-btn--active");
+      registerModeBtn?.classList.add("login-mode-btn--active");
+      if (authSubmitBtn) authSubmitBtn.textContent = "Daftar";
+      if (authHint) authHint.textContent = "Masukkan nama pengguna baru, kata sandi, dan Gmail.";
+      if (emailGroup) emailGroup.style.display = "block"; // Tampilkan Gmail
+    } else {
+      loginModeBtn?.classList.add("login-mode-btn--active");
+      registerModeBtn?.classList.remove("login-mode-btn--active");
+      if (authSubmitBtn) authSubmitBtn.textContent = "Masuk";
+      if (authHint) authHint.textContent = "Jika belum punya akun, daftar dulu.";
+      if (emailGroup) emailGroup.style.display = "none"; // Sembunyikan Gmail
+    }
   }
 
   function getFavoriteIds() {
@@ -348,6 +425,21 @@ const Auth = (() => {
     return !!currentUser;
   }
 
+  function logActivity(type, description) {
+    try {
+      const logs = JSON.parse(localStorage.getItem("dashboard_activities") || "[]");
+      logs.unshift({
+        id: "act_" + Date.now(),
+        type: type, // "kuis", "rekomendasi", "pencarian", "navigasi", "auth"
+        description: description,
+        time: new Date().toISOString()
+      });
+      localStorage.setItem("dashboard_activities", JSON.stringify(logs.slice(0, 100)));
+    } catch (error) {
+      console.warn("Gagal menyimpan log aktivitas", error);
+    }
+  }
+
   return {
     init,
     openLoginModal,
@@ -356,6 +448,7 @@ const Auth = (() => {
     getFavoriteIds,
     isFavorite,
     toggleFavorite,
+    logActivity
   };
 })();
 

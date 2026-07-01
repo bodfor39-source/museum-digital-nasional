@@ -1,0 +1,19 @@
+/**
+ * home.css — Homepage Specific Style Extensions
+ * Museum Digital Nasional Indonesia
+ */
+
+#ai-portal {
+  border-top: 1px solid rgba(201, 168, 76, 0.15);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+}
+
+.feature-card {
+  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base) !important;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-400) !important;
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(201, 168, 76, 0.1) !important;
+}

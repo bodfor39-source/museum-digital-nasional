@@ -1,0 +1,34 @@
+/**
+ * explorer.css — Explorer & Traditional Filtering page styles
+ * Layout, grid cards, and filter component enhancements.
+ * Museum Digital Nasional Indonesia
+ */
+
+.explorer-header-section {
+  background: radial-gradient(circle at top right, rgba(201, 168, 76, 0.05), transparent 60%), var(--navy-900) !important;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+}
+
+/* Card hover scaling and glow effect */
+.batik-card {
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base) !important;
+}
+.batik-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(201, 168, 76, 0.3) !important;
+  box-shadow: 0 12px 30px rgba(10, 14, 26, 0.15), 0 0 15px rgba(201, 168, 76, 0.05) !important;
+}
+
+/* Sidebar filter scroll layout for mobile */
+@media (max-width: 768px) {
+  .explorer__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .explorer__sidebar {
+    width: 100%;
+    position: relative;
+    top: 0;
+  }
+}
