@@ -1401,3 +1401,108 @@ input::placeholder, textarea::placeholder {
   color: rgba(255,255,255,0.7) !important;
 }
 
+/* ===== MOBILE RESPONSIVE IMPROVEMENTS (Android & iOS) ===== */
+
+/* Touch targets — lebih besar untuk jari */
+@media (max-width: 768px) {
+  /* Navbar mobile fix */
+  .navbar__logo { margin: 0; }
+  .navbar__logo-title { font-size: 1rem; }
+  .navbar__logo-sub { font-size: 0.6rem; }
+
+  /* Login modal — full viewport safe */
+  .login-modal {
+    width: calc(100vw - 2rem) !important;
+    max-width: 100% !important;
+    max-height: 90svh !important;
+    overflow-y: auto !important;
+    top: 50% !important;
+    padding: 1.25rem !important;
+  }
+  .login-form__label input {
+    padding: 0.85rem 0.9rem !important;
+    font-size: 1rem !important; /* Prevents iOS zoom on input focus */
+  }
+  .login-mode-btn { padding: 0.8rem 0.75rem !important; font-size: 0.85rem !important; }
+  #auth-submit-btn, .btn-full { padding: 0.9rem !important; font-size: 1rem !important; }
+
+  /* Dashboard cards stack vertically */
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+  .dashboard-stat-card { padding: 1.2rem 0.75rem !important; }
+  .dashboard-stat-card__value { font-size: 1.8rem !important; }
+  .dashboard-stat-card__label { font-size: 0.7rem !important; }
+
+  /* Glass cards padding reduce */
+  .glass-card { padding: 1rem !important; }
+
+  /* Admin section overflow */
+  .dash-section { overflow-x: auto; }
+}
+
+@media (max-width: 480px) {
+  /* Single column dashboard stats */
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Hero adjustments */
+  .hero__title { font-size: clamp(1.8rem, 7vw, 3rem) !important; }
+
+  /* Reduce font-size on stats */
+  .dashboard-stat-card__value { font-size: 1.6rem !important; }
+
+  /* Login modal full screen on very small devices */
+  .login-modal {
+    width: 100vw !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    transform: none !important;
+    left: 0 !important;
+  }
+
+  /* Admin user modal */
+  #admin-user-modal {
+    width: 100vw !important;
+    max-width: 100% !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    transform: none !important;
+    left: 0 !important;
+    max-height: 85svh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Radar feed font */
+  #admin-radar-feed { font-size: 0.72rem !important; padding: 10px !important; }
+
+  /* Batik grid fix */
+  #batik-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
+}
+
+/* iOS Safari specific: prevent font-size zoom on input */
+@supports (-webkit-touch-callout: none) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area support for notched phones */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  footer {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  #nav-menu {
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  }
+}
+
