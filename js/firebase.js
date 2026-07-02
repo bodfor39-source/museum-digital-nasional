@@ -2,6 +2,7 @@
  * firebase.js — Firebase Realtime Database (REST API)
  * Cross-device sync untuk Museum Digital Nasional Indonesia
  * Database: museum-digital-e9734
+ * v2.0 — Preload semua data sebelum halaman aktif
  */
 
 const FIREBASE_URL = "https://museum-digital-e9734-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -35,15 +36,20 @@ const DB = (() => {
   async function pull(fbPath, localKey, fallback = []) {
     const fbData = await read(fbPath);
     if (fbData !== null && fbData !== undefined) {
-      localStorage.setItem(localKey, JSON.stringify(fbData));
+      // Firebase punya data → timpa localStorage
+      try { localStorage.setItem(localKey, JSON.stringify(fbData)); } catch {}
       return fbData;
     }
     // Firebase kosong → push data lokal ke Firebase
     const raw = localStorage.getItem(localKey);
     if (raw) {
-      const local = JSON.parse(raw);
-      await write(fbPath, local);
-      return local;
+      try {
+        const local = JSON.parse(raw);
+        if (local && (Array.isArray(local) ? local.length > 0 : Object.keys(local).length > 0)) {
+          await write(fbPath, local);
+          return local;
+        }
+      } catch {}
     }
     return fallback;
   }
@@ -54,11 +60,35 @@ const DB = (() => {
     await write(fbPath, data);
   }
 
+  // ─── Preload: Pull semua data kritis sebelum app init ────────────
+  async function preloadAll() {
+    console.log("[Firebase] Memulai preload data dari cloud...");
+    try {
+      // Pull semua path penting secara paralel
+      await Promise.allSettled([
+        pull("users",            "museum_users",           []),
+        pull("batik_data",       "global_batik_data",      []),
+        pull("comments",         "museum_comments",        []),
+        pull("quiz_leaderboard", "quiz_leaderboard",       []),
+        pull("reset_requests",   "museum_reset_requests",  []),
+        pull("activities",       "museum_activities",      []),
+      ]);
+      console.log("[Firebase] ✅ Preload selesai — data siap dipakai.");
+    } catch (e) {
+      console.warn("[Firebase] Preload gagal sebagian:", e.message);
+    }
+  }
+
   // ─── Status koneksi ──────────────────────────────────────────────
   function isOnline() { return online; }
 
-  return { read, write, update, del, pull, push, isOnline };
+  return { read, write, update, del, pull, push, push, preloadAll, isOnline };
 })();
 
 window.DB = DB;
-console.log("[Firebase] Modul dimuat. DB URL:", FIREBASE_URL);
+
+// ─── AUTO PRELOAD: jalankan sebelum DOMContentLoaded selesai ────────
+// Simpan promise agar auth.js bisa menunggu selesai
+window._dbReady = DB.preloadAll();
+
+console.log("[Firebase] Modul dimuat. Preload dimulai. DB URL:", FIREBASE_URL);

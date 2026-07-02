@@ -454,7 +454,7 @@ const COLOR_SWATCHES = [
 
 try {
   let localBatiks = JSON.parse(localStorage.getItem("global_batik_data"));
-  if (!localBatiks) {
+  if (!localBatiks || !Array.isArray(localBatiks) || localBatiks.length === 0) {
     localBatiks = BATIK_DATA;
     localStorage.setItem("global_batik_data", JSON.stringify(localBatiks));
   }
@@ -478,3 +478,23 @@ try {
 
 window.REGIONS      = REGIONS;
 window.COLOR_SWATCHES = COLOR_SWATCHES;
+
+// ─── Refresh BATIK_DATA setelah Firebase preload selesai ─────────────
+// Ini memastikan batik yang ditambah admin di device lain terlihat
+if (window._dbReady) {
+  window._dbReady.then(() => {
+    try {
+      const fbBatiks = JSON.parse(localStorage.getItem("global_batik_data") || "[]");
+      if (Array.isArray(fbBatiks) && fbBatiks.length > 0) {
+        window.BATIK_DATA = fbBatiks;
+        // Refresh tampilan galeri jika sudah dirender
+        if (window.Gallery && typeof window.Gallery.refresh === "function") {
+          window.Gallery.refresh();
+        } else if (typeof renderBatikGrid === "function") {
+          renderBatikGrid();
+        }
+        console.log(`[Firebase] BATIK_DATA diperbarui: ${fbBatiks.length} koleksi.`);
+      }
+    } catch {}
+  }).catch(() => {});
+}

@@ -52,7 +52,7 @@ const Auth = (() => {
   // ===================================================
   // INIT
   // ===================================================
-  function init() {
+  async function init() {
     loginButton = document.getElementById("login-button");
     loginModal = document.getElementById("login-modal");
     loginCloseBtn = document.getElementById("login-close-btn");
@@ -65,6 +65,12 @@ const Auth = (() => {
     registerModeBtn = document.getElementById("register-mode-btn");
     authSubmitBtn = document.getElementById("auth-submit-btn");
     authHint = document.getElementById("auth-hint");
+
+    // Tunggu Firebase preload selesai (maks ~3 detik) agar data terbaru tersedia
+    if (window._dbReady) {
+      try { await Promise.race([window._dbReady, new Promise(r => setTimeout(r, 3000))]); }
+      catch {}
+    }
 
     loadUserStore();
     loadSession();
@@ -702,16 +708,16 @@ const Auth = (() => {
     try {
       const s = localStorage.getItem(USER_STORE_KEY);
       userStore = s ? JSON.parse(s) : [];
+      if (!Array.isArray(userStore)) userStore = [];
     } catch { userStore = []; }
     ensureDefaultAdmin();
-
-    // Sinkronisasi dari Firebase di background (tanpa memblokir UI)
-    if (window.DB) {
-      DB.pull("users", USER_STORE_KEY, userStore).then(fbUsers => {
+    // Note: Data sudah di-preload dari Firebase oleh firebase.js sebelum init() dipanggil.
+    // Background refresh ringan untuk memastikan data terbaru setelah login
+    if (window.DB && navigator.onLine) {
+      DB.read("users").then(fbUsers => {
         if (!fbUsers || !Array.isArray(fbUsers)) return;
         userStore = fbUsers;
         ensureDefaultAdmin();
-        // Perbarui sesi aktif dengan data terbaru dari Firebase
         if (currentUser) {
           const fresh = findUser(currentUser.username);
           if (fresh) {
