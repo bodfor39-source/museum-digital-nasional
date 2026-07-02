@@ -102,6 +102,35 @@ const Admin = (() => {
       imageUrlInput.addEventListener("blur", handleImageUrlChange);
     }
 
+    // Clear main image button
+    const clearMainImageBtn = document.getElementById("admin-clear-main-image");
+    if (clearMainImageBtn) {
+      clearMainImageBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        currentPreviewSource = null;
+        if (imageUrlInput) imageUrlInput.value = "";
+        if (imageFileInput) imageFileInput.value = "";
+        hidePreviewImage();
+        renderAdminMessage("Foto utama berhasil dihapus.", "success");
+      });
+    }
+
+    // Clear all samples button
+    const clearAllSamplesBtn = document.getElementById("admin-clear-all-samples");
+    if (clearAllSamplesBtn) {
+      clearAllSamplesBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!confirm("Anda yakin ingin menghapus semua foto terkait?")) return;
+        pendingSampleSources = [];
+        if (sampleFileInput) sampleFileInput.value = "";
+        const samplesField = document.getElementById("admin-samples");
+        if (samplesField) samplesField.value = "";
+        updateSampleFileStatus();
+        renderSampleList();
+        renderAdminMessage("Semua foto terkait berhasil dihapus.", "success");
+      });
+    }
+
     const adminDeleteBtn = document.getElementById("admin-delete-btn");
     if (adminDeleteBtn) {
       adminDeleteBtn.addEventListener("click", () => {
@@ -164,19 +193,34 @@ const Admin = (() => {
 
   function saveMotif(motif) {
     try {
+      // 1) Simpan versi "admin" (lama)
       const stored = localStorage.getItem(STORAGE_KEY);
       const extraMotifs = stored ? JSON.parse(stored) : [];
       const filtered = Array.isArray(extraMotifs) ? extraMotifs.filter((item) => item.id !== motif.id) : [];
       filtered.unshift(motif);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+
+      // 2) Sinkronkan ke data yang dipakai UI (global_batik_data)
+      // Supaya Explorer/Modal langsung menampilkan perubahan motif.samples.
+      let allBatiks = JSON.parse(localStorage.getItem("global_batik_data") || "[]");
+      if (!Array.isArray(allBatiks)) allBatiks = [];
+
+      const idx = allBatiks.findIndex((b) => b.id === motif.id);
+      if (idx >= 0) allBatiks[idx] = motif;
+      else allBatiks.push(motif);
+
+      localStorage.setItem("global_batik_data", JSON.stringify(allBatiks));
+
+      // Update state global runtime juga
+      window.BATIK_DATA = allBatiks;
     } catch (error) {
-      console.warn("Gagal menyimpan motif tambahan", error);
+      console.warn("Gagal menyimpan motif tambahan / sinkron global", error);
     }
   }
 
   function deleteMotif(motifId) {
     if (!confirm("Admin: Anda yakin ingin menghapus motif ini beserta semua datanya secara permanen?")) return;
-    
+
     // Hapus dari localStorage
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -187,15 +231,19 @@ const Admin = (() => {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
         }
       }
+
+      // Sinkron juga ke data yang dipakai UI
+      let allBatiks = JSON.parse(localStorage.getItem("global_batik_data") || "[]");
+      if (!Array.isArray(allBatiks)) allBatiks = [];
+      allBatiks = allBatiks.filter((b) => b.id !== motifId);
+      localStorage.setItem("global_batik_data", JSON.stringify(allBatiks));
+
+      // Update state global runtime
+      window.BATIK_DATA = allBatiks;
     } catch (error) {
-      console.warn("Gagal menghapus motif dari localStorage", error);
+      console.warn("Gagal menghapus motif dari localStorage / sinkron global", error);
     }
 
-    // Hapus dari BATIK_DATA in memory
-    const existingIndex = window.BATIK_DATA.findIndex((item) => item.id === motifId);
-    if (existingIndex >= 0) {
-      window.BATIK_DATA.splice(existingIndex, 1);
-    }
 
     resetAdminForm({ keepTemplate: false });
     populateMotifOptions();
@@ -294,6 +342,11 @@ const Admin = (() => {
             ? [imageSource]
             : [],
 
+      // Pastikan konsisten dengan UI/detail "Galeri" yang membaca motif.samples
+      // (Modal menggunakan motif.samples untuk Foto Terkait).
+      // Jadi field samples harus benar-benar merepresentasikan foto terkait.
+
+
       // Konsisten dengan explorer.js (yang mencari motif.ciriKhasMotif)
       ciriKhasMotif: feature,
       ciriKhas: feature,
@@ -335,11 +388,19 @@ const Admin = (() => {
       window.BATIK_DATA.push(motif);
     }
 
+    // Simpan lalu refresh state global agar Modal/Explorer membaca motif.samples terbaru
     saveMotif(motif);
+
+    // Saat ini saveMotif sudah menyinkronkan ke global_batik_data dan window.BATIK_DATA.
+    // loadSavedMotifs bisa menyebabkan duplikasi/urutan berbeda, jadi tidak dipanggil di sini.
+
     populateMotifOptions();
     if (window.Explorer) {
-      // Pastikan grid langsung refresh dengan filter yang sedang aktif.
       window.Explorer.applyFilters();
+    }
+
+    if (window.Modal && window.Modal.close) {
+      // tidak memaksa close modal; hanya memastikan render berikutnya pakai data terbaru
     }
 
     resetAdminForm();
@@ -535,10 +596,15 @@ const Admin = (() => {
     sampleList.innerHTML = items
       .map((item) => `
         <div class="admin-sample-item">
-          <span class="admin-sample-item__text" title="${escapeHtml(item.src)}">${escapeHtml(item.label)}</span>
-          <button class="admin-sample-item__delete" type="button" data-sample-type="${item.type}" data-sample-index="${item.index}">
-            Hapus
-          </button>
+          <div class="admin-sample-item__preview">
+            <img src="${escapeHtml(item.src)}" alt="Pratinjau foto terkait" class="admin-sample-item__thumbnail" onerror="this.style.display='none'" />
+          </div>
+          <div class="admin-sample-item__info">
+            <span class="admin-sample-item__label">${item.type === "pending" ? "🆕" : "📷"} ${escapeHtml(item.label)}</span>
+            <button class="admin-sample-item__delete" type="button" data-sample-type="${item.type}" data-sample-src="${escapeHtml(item.src)}" title="Hapus foto ini">
+              ✕ Hapus
+            </button>
+          </div>
         </div>
       `)
       .join("");
@@ -551,16 +617,21 @@ const Admin = (() => {
   function handleSampleDelete(event) {
     const button = event.currentTarget;
     const type = button.dataset.sampleType;
-    const index = Number(button.dataset.sampleIndex);
+    const srcToRemove = button.dataset.sampleSrc;
+
+    if (!type || !srcToRemove) {
+      renderSampleList();
+      return;
+    }
 
     if (type === "saved") {
       const sources = getSampleInputSources();
-      sources.splice(index, 1);
-      setValue("admin-samples", sources.join(", "));
+      const filtered = sources.filter((src) => src !== srcToRemove);
+      setValue("admin-samples", filtered.join(", "));
     }
 
     if (type === "pending") {
-      pendingSampleSources.splice(index, 1);
+      pendingSampleSources = pendingSampleSources.filter((src) => src !== srcToRemove);
       if (sampleFileInput && pendingSampleSources.length === 0) {
         sampleFileInput.value = "";
       }
