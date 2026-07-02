@@ -1220,7 +1220,43 @@ body.body--cb-open { overflow: hidden; }
   #batik-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
   .modal-gallery { grid-template-columns: repeat(2, 1fr); }
   .tentang__features { grid-template-columns: 1fr; }
+
+  /* ===== Mobile: touch target & image safety (iOS/Android) ===== */
+  button,
+  a.btn-ghost,
+  a.btn-primary,
+  .btn-ghost,
+  .btn-primary,
+  .btn-small {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Modal gallery in detail motif */
+  .modal-gallery {
+    gap: 10px;
+  }
+  .modal-gallery-item {
+    border-radius: calc(var(--radius-md) - 2px);
+    overflow: hidden;
+  }
+  .modal-gallery-item img {
+    object-fit: cover;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* Ensure no horizontal scroll on small screens */
+  #batik-grid,
+  .explorer__layout,
+  .explorer__sidebar,
+  .motif-modal,
+  .modal-inner {
+    width: 100%;
+    overflow-x: hidden;
+  }
 }
+
 
 .modal-contributor-badge {
   font-size: 0.65rem; font-weight: 500; letter-spacing: 0.06em;
