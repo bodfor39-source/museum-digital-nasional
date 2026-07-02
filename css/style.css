@@ -1506,3 +1506,110 @@ input::placeholder, textarea::placeholder {
   }
 }
 
+/* ===================== PERBAIKAN MOBILE ===================== */
+
+/* Cegah zoom pada input di iOS */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Navbar — cegah semua item muncul sejajar di HP */
+  .navbar__inner {
+    padding: 0 1rem;
+  }
+
+  /* Modal tidak terpotong keyboard HP */
+  .login-modal,
+  #recovery-modal > div,
+  #gmail-modal > div {
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    position: relative;
+  }
+
+  /* Pastikan modal overlay bisa scroll saat keyboard muncul */
+  #recovery-modal,
+  #gmail-modal {
+    align-items: flex-start !important;
+    padding-top: 2rem !important;
+    overflow-y: auto !important;
+  }
+
+  /* Gambar batik di card — tampil penuh, tidak terpotong */
+  .batik-card__image {
+    object-fit: contain !important;
+    background: #0a0e1a;
+  }
+
+  /* Dashboard grid — 1 kolom di HP */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Admin panel batik — grid 1 kolom */
+  #add-batik-name,
+  #add-batik-region {
+    grid-column: 1 / -1;
+  }
+
+  /* Quiz arena grid — stack di HP */
+  .quiz-lobby-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Panel saran & reset — tombol full width */
+  #admin-pending-suggestions button,
+  #admin-reset-requests button {
+    width: 100% !important;
+    margin-top: 4px;
+  }
+
+  /* OTP input lebih compact di HP */
+  #rec-input-otp,
+  #gmail-input-otp {
+    font-size: 1.5rem !important;
+    letter-spacing: 0.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Gambar hero section tidak terlalu tinggi */
+  .hero-section,
+  .explorer-header-section {
+    padding-top: 90px !important;
+  }
+
+  /* Teks hero lebih kecil */
+  h1 { font-size: 1.8rem !important; }
+
+  /* Tombol navigasi di quiz lebih kecil */
+  .quiz-mode-btn {
+    padding: 0.65rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Dashboard stat cards — 3 kolom tetap tapi lebih kecil */
+  .dashboard-stat-card {
+    padding: 0.75rem 0.5rem !important;
+  }
+  .dashboard-stat-card__value {
+    font-size: 1.4rem !important;
+  }
+
+  /* Glass card padding lebih hemat di HP kecil */
+  .glass-card {
+    padding: 1rem !important;
+  }
+
+  /* Login modal lebih compact */
+  .login-modal {
+    padding: 1.25rem !important;
+  }
+  .login-modal__header h3 {
+    font-size: 1.1rem !important;
+  }
+}

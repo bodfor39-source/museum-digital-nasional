@@ -45,6 +45,22 @@ const Dashboard = (() => {
     if (currentUser.isAdmin) {
       if (adminEl) adminEl.style.display = "block";
       if (userEl) userEl.style.display = "none";
+
+      // ── Sinkronisasi Firebase sebelum render ──────────────────────────
+      if (window.DB) {
+        Promise.all([
+          DB.pull("batik_data",        "global_batik_data",        []),
+          DB.pull("comments",          "museum_comments",           []),
+          DB.pull("quiz_leaderboard",  "quiz_leaderboard",         []),
+          DB.pull("reset_requests",    "museum_reset_requests",    []),
+          DB.pull("activities",        "dashboard_activities",      []),
+        ]).then(() => {
+          // Perbarui window.BATIK_DATA setelah sync
+          const synced = JSON.parse(localStorage.getItem("global_batik_data") || "[]");
+          if (synced.length) window.BATIK_DATA = synced;
+        }).catch(() => {});
+      }
+
       initVisitorStats();
       renderStats();
       renderActivityChart();
@@ -54,10 +70,13 @@ const Dashboard = (() => {
       startRadarHeartbeat(); // Radar Live
       renderAdminGmailCard(); // Status Gmail admin
       renderResetRequests(); // Permintaan reset sandi
+      renderPendingSuggestions();
     } else {
       stopRadarHeartbeat();
       if (adminEl) adminEl.style.display = "none";
       if (userEl) userEl.style.display = "block";
+      // Sync quiz leaderboard untuk user biasa juga
+      if (window.DB) DB.pull("quiz_leaderboard", "quiz_leaderboard", []).catch(() => {});
       renderUserDashboard(currentUser);
     }
   }
@@ -724,11 +743,30 @@ const Dashboard = (() => {
     let selectedSamplesBase64 = [];
     let appendSamplesBase64 = [];
 
+    // ── Validasi gambar (format & ukuran) ─────────────────────────────────
+    function validateImage(file, msgEl) {
+      const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+      const maxMB = 10;
+      const maxBytes = maxMB * 1024 * 1024;
+      if (!allowed.includes(file.type)) {
+        const ext = file.name.split(".").pop().toUpperCase();
+        if (msgEl) { msgEl.style.color = "#e74c3c"; msgEl.textContent = `❌ Format .${ext} tidak didukung. Gunakan: JPG, PNG, WebP, atau GIF.`; }
+        return false;
+      }
+      if (file.size > maxBytes) {
+        const mb = (file.size / 1024 / 1024).toFixed(1);
+        if (msgEl) { msgEl.style.color = "#e74c3c"; msgEl.textContent = `❌ Gambar terlalu besar (${mb}MB). Maksimum ${maxMB}MB per file.`; }
+        return false;
+      }
+      return true;
+    }
+
     // Load foto append (tambah ke yang sudah ada)
     if (iSamplesAppend) {
       iSamplesAppend.addEventListener("change", (e) => {
         appendSamplesBase64 = [];
         Array.from(e.target.files || []).forEach(file => {
+          if (!validateImage(file, msg)) return;
           const r = new FileReader();
           r.onload = evt => appendSamplesBase64.push(evt.target.result);
           r.readAsDataURL(file);
@@ -740,6 +778,7 @@ const Dashboard = (() => {
       iSamples.addEventListener("change", (e) => {
         selectedSamplesBase64 = [];
         Array.from(e.target.files || []).forEach(file => {
+          if (!validateImage(file, msg)) return;
           const r = new FileReader();
           r.onload = evt => selectedSamplesBase64.push(evt.target.result);
           r.readAsDataURL(file);
@@ -751,10 +790,12 @@ const Dashboard = (() => {
       iImage.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (file) {
+          if (!validateImage(file, msg)) { iImage.value = ""; selectedImageBase64 = ""; return; }
           const r = new FileReader();
           r.onload = evt => {
             selectedImageBase64 = evt.target.result;
             if (previewImg) { previewImg.src = selectedImageBase64; previewImg.style.display = "block"; }
+            if (msg) msg.textContent = ""; // clear error
           };
           r.readAsDataURL(file);
         } else { selectedImageBase64 = ""; }
@@ -825,6 +866,7 @@ const Dashboard = (() => {
         data = data.filter(x => x.id !== selectedId);
         localStorage.setItem("global_batik_data", JSON.stringify(data));
         window.BATIK_DATA = data;
+        if (window.DB) DB.write("batik_data", data); // Firebase sync
         window.Auth?.logActivity("admin", `Menghapus koleksi: ${b?.nama}`);
         if (msg) { msg.style.color = "#22c55e"; msg.textContent = `"${b?.nama}" berhasil dihapus dari koleksi.`; }
         select.value = "";
@@ -891,6 +933,7 @@ const Dashboard = (() => {
 
         localStorage.setItem("global_batik_data", JSON.stringify(data));
         window.BATIK_DATA = data;
+        if (window.DB) DB.write("batik_data", data); // Firebase sync
         if (msg) msg.style.color = "#22c55e";
         setTimeout(() => { if (msg) msg.textContent = ""; }, 3000);
         iName.value = ""; iRegion.value = ""; iDesc.value = ""; iImage.value = "";
@@ -1021,6 +1064,7 @@ const Dashboard = (() => {
       updated = comments.filter(c => c.id !== id);
     }
     localStorage.setItem("museum_comments", JSON.stringify(updated));
+    if (window.DB) DB.write("comments", updated); // Firebase sync
     window.Auth?.logActivity("admin", keep ? "Meninjau saran pengguna" : "Menghapus saran pengguna");
     renderPendingSuggestions();
   }
@@ -1058,32 +1102,30 @@ const Dashboard = (() => {
     if (idx === -1) return;
 
     if (!username) {
-      // Tolak permintaan
       requests[idx].status = "rejected";
       localStorage.setItem("museum_reset_requests", JSON.stringify(requests));
+      if (window.DB) DB.write("reset_requests", requests); // Firebase sync
       window.Auth?.logActivity("admin", `Menolak permintaan reset sandi: @${requests[idx].username}`);
       renderResetRequests();
       return;
     }
 
     const newPass = document.getElementById(`new-pass-${requestId}`)?.value.trim();
-    if (!newPass || newPass.length < 4) {
-      alert("Sandi baru minimal 4 karakter!");
-      return;
-    }
+    if (!newPass || newPass.length < 4) { alert("Sandi baru minimal 4 karakter!"); return; }
 
-    // Update sandi pengguna
+    // Update sandi pengguna + sync Firebase
     const users = JSON.parse(localStorage.getItem("museum_users") || "[]");
     const uIdx = users.findIndex(u => u.username === username);
     if (uIdx !== -1) {
       users[uIdx].password = newPass;
       localStorage.setItem("museum_users", JSON.stringify(users));
+      if (window.DB) DB.write("users", users); // Firebase sync
     }
 
-    // Tandai permintaan selesai
     requests[idx].status = "done";
     requests[idx].processedAt = new Date().toISOString();
     localStorage.setItem("museum_reset_requests", JSON.stringify(requests));
+    if (window.DB) DB.write("reset_requests", requests); // Firebase sync
     window.Auth?.logActivity("admin", `Reset sandi @${username} berhasil dilakukan`);
     alert(`✅ Sandi untuk @${username} berhasil direset menjadi: "${newPass}"\n\nBeritahu pengguna untuk segera ganti sandi setelah masuk.`);
     renderResetRequests();

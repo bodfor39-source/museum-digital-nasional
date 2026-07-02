@@ -200,6 +200,7 @@ const Modal = (() => {
           date: new Date().toISOString()
         });
         localStorage.setItem("museum_comments", JSON.stringify(comments));
+        if (window.DB) DB.write("comments", comments); // Firebase sync
         
         textInput.value = "";
         renderForum();
@@ -482,6 +483,7 @@ const Modal = (() => {
     let allComments = JSON.parse(localStorage.getItem("museum_comments") || "[]");
     allComments = allComments.filter(c => c.id !== id);
     localStorage.setItem("museum_comments", JSON.stringify(allComments));
+    if (window.DB) DB.write("comments", allComments); // Firebase sync
     renderForum();
   }
 

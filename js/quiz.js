@@ -563,7 +563,9 @@ const Quiz = (() => {
         if (existIdx !== -1) { lb[existIdx].best = Math.max(lb[existIdx].best, score); lb[existIdx].score = score; }
         else lb.push(entry);
         lb.sort((a,b) => b.best - a.best);
-        localStorage.setItem("quiz_leaderboard", JSON.stringify(lb.slice(0,20)));
+        const trimmed = lb.slice(0,20);
+        localStorage.setItem("quiz_leaderboard", JSON.stringify(trimmed));
+        if (window.DB) DB.write("quiz_leaderboard", trimmed); // Firebase sync
       }
       // Simpan ke personal history (semua user)
       const history = JSON.parse(localStorage.getItem("dashboard_quiz_scores") || "[]");

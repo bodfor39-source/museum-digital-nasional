@@ -703,6 +703,29 @@ const Auth = (() => {
       const s = localStorage.getItem(USER_STORE_KEY);
       userStore = s ? JSON.parse(s) : [];
     } catch { userStore = []; }
+    ensureDefaultAdmin();
+
+    // Sinkronisasi dari Firebase di background (tanpa memblokir UI)
+    if (window.DB) {
+      DB.pull("users", USER_STORE_KEY, userStore).then(fbUsers => {
+        if (!fbUsers || !Array.isArray(fbUsers)) return;
+        userStore = fbUsers;
+        ensureDefaultAdmin();
+        // Perbarui sesi aktif dengan data terbaru dari Firebase
+        if (currentUser) {
+          const fresh = findUser(currentUser.username);
+          if (fresh) {
+            currentUser.email     = fresh.email     ?? currentUser.email;
+            currentUser.favorites = fresh.favorites ?? currentUser.favorites;
+            saveSession();
+            updateUI();
+          }
+        }
+      }).catch(() => {});
+    }
+  }
+
+  function ensureDefaultAdmin() {
     if (!userStore.some(u => u.username === DEFAULT_ADMIN.username && u.isAdmin)) {
       userStore.unshift(DEFAULT_ADMIN);
       saveUserStore();
@@ -711,7 +734,9 @@ const Auth = (() => {
 
   function saveUserStore() {
     try { localStorage.setItem(USER_STORE_KEY, JSON.stringify(userStore)); }
-    catch (e) { console.warn("Gagal simpan userStore", e); }
+    catch (e) { console.warn("Gagal simpan userStore lokal", e); }
+    // Push ke Firebase (background)
+    if (window.DB) DB.write("users", userStore);
   }
 
   function findUser(username) {
@@ -762,8 +787,12 @@ const Auth = (() => {
     try {
       const logs = JSON.parse(localStorage.getItem("dashboard_activities") || "[]");
       const user = currentUser ? `[@${currentUser.username}] ` : "";
-      logs.unshift({ id: "act_" + Date.now(), type, description: user + description, username: currentUser?.username || "sistem", time: new Date().toISOString() });
-      localStorage.setItem("dashboard_activities", JSON.stringify(logs.slice(0, 200)));
+      const entry = { id: "act_" + Date.now(), type, description: user + description, username: currentUser?.username || "sistem", time: new Date().toISOString() };
+      logs.unshift(entry);
+      const trimmed = logs.slice(0, 200);
+      localStorage.setItem("dashboard_activities", JSON.stringify(trimmed));
+      // Sync ke Firebase (background)
+      if (window.DB) DB.write("activities", trimmed);
     } catch (e) { console.warn("Gagal log aktivitas", e); }
   }
 
@@ -779,9 +808,7 @@ const Auth = (() => {
     isFavorite,
     toggleFavorite,
     hasGmailAccess,
-    logActivity,
-    openGmailModal,
-    openAdminGmailModal: openGmailModal
+    logActivity
   };
 })();
 
