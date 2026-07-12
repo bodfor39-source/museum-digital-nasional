@@ -563,6 +563,15 @@ const Quiz = (() => {
         if (existIdx !== -1) { lb[existIdx].best = Math.max(lb[existIdx].best, score); lb[existIdx].score = score; }
         else lb.push(entry);
         lb.sort((a,b) => b.best - a.best);
+        
+        // Deteksi Tie-Breaker untuk Posisi 1
+        if (lb.length > 0 && score === lb[0].best) {
+          const tieOpponent = lb.find(e => e.best === score && e.username !== user.username);
+          if (tieOpponent) {
+            window.DuelSys?.createDuel(user.username, tieOpponent.username);
+          }
+        }
+
         const trimmed = lb.slice(0,20);
         localStorage.setItem("quiz_leaderboard", JSON.stringify(trimmed));
         if (window.DB) DB.write("quiz_leaderboard", trimmed); // Firebase sync

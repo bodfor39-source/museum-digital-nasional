@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -78,6 +78,13 @@
         <h2 style="color: var(--navy-800); margin-bottom: 15px;">Akses Terbatas</h2>
         <p style="color: var(--text-muted); margin-bottom: 20px;">Silakan masuk (login) untuk melihat dashboard analitik Anda.</p>
         <button class="btn-primary" onclick="document.getElementById('login-button').click()">Masuk Sekarang</button>
+      </div>
+
+      <!-- Arena Duel Kuis Container -->
+      <div id="duel-arena-container" style="margin-bottom: 25px;"></div>
+
+      <!-- Overview Stats (Grid) -->
+      <div id="dashboard-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
       </div>
 
       <!-- ADMIN DASHBOARD VIEW -->
@@ -439,6 +446,7 @@
     <script src="js/colorblind.js?v=14"></script>
     <script src="js/dashboard.js?v=14"></script>
     <script src="js/auth.js?v=14"></script>
+    <script src="js/duel.js?v=1"></script>
     <script src="js/main.js?v=14"></script>
     <script>
       document.getElementById("footer-year").textContent = new Date().getFullYear();

@@ -17,7 +17,14 @@ const DB = (() => {
     if (!online) return null;
     try {
       const opts = { method, headers: { "Content-Type": "application/json" } };
-      if (data !== undefined) opts.body = JSON.stringify(data);
+      if (data !== undefined) {
+        // Trik Firebase: Jika array kosong, kirim {_empty:true} agar node tidak terhapus
+        if (Array.isArray(data) && data.length === 0) {
+          opts.body = JSON.stringify({ _empty: true });
+        } else {
+          opts.body = JSON.stringify(data);
+        }
+      }
       const r = await fetch(`${FIREBASE_URL}/${path}.json`, opts);
       if (!r.ok) { console.warn(`[Firebase] ${method} /${path} → ${r.status}`); return null; }
       return method === "DELETE" ? true : await r.json();
@@ -34,13 +41,17 @@ const DB = (() => {
 
   // ─── Sync: Baca dari Firebase, simpan ke localStorage ───────────
   async function pull(fbPath, localKey, fallback = []) {
-    const fbData = await read(fbPath);
+    let fbData = await read(fbPath);
     if (fbData !== null && fbData !== undefined) {
+      // Jika Firebase mengembalikan objek penanda kosong, jadikan array kosong
+      if (fbData._empty === true) {
+        fbData = [];
+      }
       // Firebase punya data → timpa localStorage
       try { localStorage.setItem(localKey, JSON.stringify(fbData)); } catch {}
       return fbData;
     }
-    // Firebase kosong → push data lokal ke Firebase
+    // Firebase kosong (benar-benar dihapus/belum ada) → push data lokal ke Firebase
     const raw = localStorage.getItem(localKey);
     if (raw) {
       try {
@@ -71,7 +82,8 @@ const DB = (() => {
         pull("comments",         "museum_comments",        []),
         pull("quiz_leaderboard", "quiz_leaderboard",       []),
         pull("reset_requests",   "museum_reset_requests",  []),
-        pull("activities",       "museum_activities",      []),
+        pull("activities",       "dashboard_activities",   []),
+        pull("duels",            "museum_duels",           []),
       ]);
       console.log("[Firebase] ✅ Preload selesai — data siap dipakai.");
     } catch (e) {

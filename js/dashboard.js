@@ -41,6 +41,9 @@ const Dashboard = (() => {
     }
 
     if (promptEl) promptEl.style.display = "none";
+    
+    // Render Duel Arena
+    window.DuelSys?.renderArena();
 
     if (currentUser.isAdmin) {
       if (adminEl) adminEl.style.display = "block";
