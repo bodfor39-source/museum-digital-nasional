@@ -278,6 +278,8 @@ const Auth = (() => {
     }
     requests.unshift({ id: "req_" + Date.now(), username, status: "pending", requestedAt: new Date().toISOString() });
     localStorage.setItem("museum_reset_requests", JSON.stringify(requests));
+    if (window.DB) DB.write("reset_requests", requests);
+    logActivity("auth", `Meminta reset sandi untuk @${username} via admin`);
     setRecMsg("✅ Permintaan berhasil dikirim ke Admin! Admin akan menetapkan sandi baru untuk Anda. Silakan cek kembali nanti.", "#22c55e");
     const btn = document.getElementById("btn-req-admin-reset");
     if (btn) { btn.disabled = true; btn.textContent = "✅ Permintaan Terkirim"; }
