@@ -553,6 +553,7 @@ const Auth = (() => {
     logActivity("auth", `Masuk ke akun`);
     showMessage(`✅ Selamat datang, ${username}!`);
     updateUI();
+    window.PvPSys?.initUserPvP(currentUser);
     dispatchAuthEvent();
     setTimeout(closeLoginModal, 900);
   }

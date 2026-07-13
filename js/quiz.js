@@ -63,14 +63,17 @@ const Quiz = (() => {
         <!-- Layout: Papan Skor + Info -->
         <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:1.5rem;">
 
-          <!-- Papan Skor -->
-          <div class="glass-card" style="padding:1.5rem;">
+          <!-- Papan Skor Kuis Biasa -->
+          <div class="glass-card" style="padding:1.5rem; margin-bottom: 1rem;">
             <h3 style="color:var(--gold-400);font-size:1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">
               🏅 Papan Skor Teratas
               <span style="font-size:0.72rem;color:rgba(249,240,224,0.4);font-weight:400;margin-left:auto;">Hanya akun Gmail</span>
             </h3>
             ${renderLeaderboardHTML(leaderboard)}
           </div>
+          
+          <!-- Papan Skor Duel PvP Rebut Poin -->
+          <div id="pvp-leaderboard-container"></div>
 
           <!-- Info Tier -->
           <div style="display:flex;flex-direction:column;gap:1rem;">
@@ -94,6 +97,13 @@ const Quiz = (() => {
 
       </div>
     `;
+
+    // Render PvP Leaderboard asinkron
+    if (window.PvPSys) {
+      setTimeout(() => {
+        window.PvPSys.renderPvPLeaderboard("pvp-leaderboard-container");
+      }, 50);
+    }
   }
 
   function renderLeaderboardHTML(lb) {

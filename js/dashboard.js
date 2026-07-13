@@ -44,6 +44,7 @@ const Dashboard = (() => {
     
     // Render Duel Arena
     window.DuelSys?.renderArena();
+    window.PvPSys?.renderArena();
 
     if (currentUser.isAdmin) {
       if (adminEl) adminEl.style.display = "block";
@@ -449,6 +450,21 @@ const Dashboard = (() => {
     // 0. Update Profile Info
     if (dashUserName) {
       dashUserName.textContent = "Halo, " + (user.username || "Pengguna");
+    }
+
+    // 0.5 Update PvP Stats
+    const pvpPointsEl = document.getElementById("user-dash-pvp-points");
+    const pvpWinsEl = document.getElementById("user-dash-pvp-wins");
+    if (pvpPointsEl && pvpWinsEl) {
+      const pvpLb = JSON.parse(localStorage.getItem("museum_pvp_leaderboard") || "[]");
+      const pvpEntry = pvpLb.find(e => e.username === user.username);
+      if (pvpEntry) {
+        pvpPointsEl.textContent = pvpEntry.points || 0;
+        pvpWinsEl.textContent = pvpEntry.wins || 0;
+      } else {
+        pvpPointsEl.textContent = "100"; // Starting points if not initialized
+        pvpWinsEl.textContent = "0";
+      }
     }
 
     // === Gmail Tier Info ===

@@ -84,6 +84,8 @@ const DB = (() => {
         pull("reset_requests",   "museum_reset_requests",  []),
         pull("activities",       "dashboard_activities",   []),
         pull("duels",            "museum_duels",           []),
+        pull("pvp_leaderboard",  "museum_pvp_leaderboard", []),
+        pull("pvp_duels",        "museum_pvp_duels",       []),
       ]);
       console.log("[Firebase] ✅ Preload selesai — data siap dipakai.");
     } catch (e) {
