@@ -11,22 +11,23 @@ const DuelSys = (() => {
   let currentUser = null;
 
   // Render Arena Duel di Dasbor
-  function renderArena() {
+  async function renderArena() {
     uiContainer = document.getElementById("duel-arena-container");
     if (!uiContainer) return;
-
-    if (!window.Auth || !window.Auth.isLoggedIn()) {
+    
+    currentUser = window.Auth?.getCurrentUser();
+    if (!currentUser || !currentUser.email) {
       uiContainer.innerHTML = "";
       return;
     }
-    currentUser = window.Auth.getCurrentUser();
-    if (!currentUser || !currentUser.email) {
-      uiContainer.innerHTML = ""; // Hanya untuk akun ber-Gmail
-      return;
+
+    if (window.DB && navigator.onLine) {
+      await DB.pull("duels", "museum_duels", []);
     }
 
     const duels = JSON.parse(localStorage.getItem("museum_duels") || "[]");
-    // Cari duel yang melibatkan user ini dan belum selesai
+    
+    // Cari duel di mana user ini terlibat, dan belum finished
     const activeDuel = duels.find(d => 
       (d.player1 === currentUser.username || d.player2 === currentUser.username) && 
       d.status !== "finished"
@@ -39,7 +40,7 @@ const DuelSys = (() => {
           <p style="color:rgba(249,240,224,0.6); font-size:0.9rem;">Tidak ada duel yang aktif. Cetak skor tertinggi di kuis untuk menantang lawan Anda berduel!</p>
         </div>
       `;
-      stopPolling();
+      startPolling(); // Terus polling untuk mendeteksi tantangan baru
       return;
     }
 
@@ -294,6 +295,8 @@ const DuelSys = (() => {
         
         if (newActive && (!oldActive || JSON.stringify(newActive) !== JSON.stringify(oldActive))) {
           // Ada update dari lawan!
+          renderArena();
+        } else if (!newActive && oldActive) {
           renderArena();
         }
       }

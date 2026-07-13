@@ -167,7 +167,7 @@ const PvPSys = (() => {
 
   // --- RENDER ARENA DI DASHBOARD ---
   // Fungsi ini dipanggil dari dashboard.js
-  function renderArena() {
+  async function renderArena() {
     uiContainer = document.getElementById("pvp-arena-container");
     if (!uiContainer) return;
 
@@ -175,6 +175,10 @@ const PvPSys = (() => {
     if (!currentUser || !currentUser.email) {
       uiContainer.innerHTML = "";
       return;
+    }
+
+    if (window.DB && navigator.onLine) {
+      await DB.pull("pvp_duels", "museum_pvp_duels", []);
     }
 
     const duels = JSON.parse(localStorage.getItem("museum_pvp_duels") || "[]");
@@ -185,7 +189,7 @@ const PvPSys = (() => {
 
     if (!activeDuel) {
       uiContainer.innerHTML = ""; // Sembunyikan jika tidak ada duel PvP
-      stopPolling();
+      startPolling(); // Tetap polling mencari tantangan baru
       return;
     }
 
@@ -490,6 +494,9 @@ const PvPSys = (() => {
         const newActive = fresh.find(d => d.id === currentDuelId);
         
         if (newActive && (!oldActive || JSON.stringify(newActive) !== JSON.stringify(oldActive))) {
+          renderArena();
+        } else if (!newActive && oldActive) {
+          // Jika duel dibatalkan atau selesai
           renderArena();
         }
       }

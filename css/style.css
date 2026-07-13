@@ -172,6 +172,7 @@ body.body--cb-open { overflow: hidden; }
   width: 40px; height: 40px; padding: 8px;
   background: none; border: none; cursor: pointer;
   z-index: 110; position: relative;
+  color: var(--text-light);
 }
 .accessibility-toggle {
   position: absolute; left: 0; top: 50%; transform: translateY(-50%);
