@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Arena PvP Rebut Poin — Tantang pemain lain dan rampas poin mereka dalam mini-game seru!" />
+    <title>Arena PvP — Museum Digital Nasional Indonesia</title>
+    <link rel="stylesheet" href="css/style.css?v=14" />
+    <style>
+      body { background: #0a0a0f; }
+      .pvp-hero {
+        background: linear-gradient(135deg, #1a0505 0%, #0d0d1a 50%, #1a0505 100%);
+        padding: 110px 2rem 40px;
+        text-align: center;
+        border-bottom: 1px solid rgba(231,76,60,0.2);
+        position: relative;
+        overflow: hidden;
+      }
+      .pvp-hero::before {
+        content: "";
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(231,76,60,0.15), transparent);
+        pointer-events: none;
+      }
+      .pvp-hero h1 { font-size: clamp(1.8rem, 5vw, 3rem); color: #e74c3c; margin-bottom: 10px; font-family: var(--font-display); text-shadow: 0 0 30px rgba(231,76,60,0.5); }
+      .pvp-hero p { color: rgba(249,240,224,0.7); max-width: 600px; margin: 0 auto; font-size: 0.95rem; }
+      .pvp-main { max-width: 1100px; margin: 0 auto; padding: 30px 1.5rem 80px; }
+      .pvp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+      @media (max-width: 768px) { .pvp-grid { grid-template-columns: 1fr; } }
+      .pvp-card { background: linear-gradient(135deg, rgba(40,10,10,0.9), rgba(15,15,30,0.95)); border: 1px solid rgba(231,76,60,0.3); border-radius: 16px; padding: 25px; }
+      .pvp-card h2 { color: #e74c3c; font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+      .lb-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.35); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; transition: 0.2s; }
+      .lb-row:hover { border-color: rgba(231,76,60,0.3); }
+      .lb-row.is-me { background: rgba(231,76,60,0.12); border-color: rgba(231,76,60,0.4); }
+      .lb-rank { font-weight: 900; color: var(--gold-400); min-width: 28px; }
+      .lb-name { font-weight: 700; color: white; font-size: 1rem; }
+      .lb-sub { font-size: 0.72rem; color: rgba(255,255,255,0.45); }
+      .lb-pts { font-size: 1.2rem; font-weight: 900; color: #e74c3c; min-width: 70px; text-align: right; }
+      .btn-challenge { background: #c0392b; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.8rem; transition: 0.2s; white-space: nowrap; }
+      .btn-challenge:hover { background: #e74c3c; transform: scale(1.05); }
+      .arena-box { background: linear-gradient(135deg, #2c0e0e, #1a0505); border: 2px solid #c0392b; border-radius: 14px; padding: 22px; }
+      .arena-vs { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; background: rgba(231,76,60,0.08); padding: 15px; border-radius: 10px; border: 1px solid rgba(231,76,60,0.25); }
+      .arena-player { text-align: center; width: 40%; }
+      .arena-player-name { font-weight: 700; color: white; font-size: 0.9rem; }
+      .arena-player-status { font-size: 1.6rem; margin-top: 8px; }
+      .arena-vs-text { font-size: 2rem; font-weight: 900; color: #e74c3c; text-shadow: 0 0 12px rgba(231,76,60,0.6); }
+      .game-box { background: rgba(0,0,0,0.5); border-radius: 10px; padding: 20px; margin-top: 15px; text-align: center; }
+      .game-title { font-size: 0.95rem; color: rgba(249,240,224,0.8); margin-bottom: 15px; }
+      .game-img { width: 140px; height: 140px; object-fit: cover; border-radius: 10px; border: 3px solid #e74c3c; margin-bottom: 12px; filter: blur(8px); transition: filter 0.5s; }
+      .game-img.revealed { filter: none; }
+      .game-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+      .choice-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: 0.2s; }
+      .choice-btn:hover { background: rgba(231,76,60,0.25); border-color: #e74c3c; }
+      .choice-btn.correct { background: rgba(46,204,113,0.25); border-color: #2ecc71; color: #2ecc71; }
+      .choice-btn.wrong { background: rgba(231,76,60,0.25); border-color: #e74c3c; color: #e74c3c; }
+      .anagram-display { font-size: 2rem; font-weight: 900; letter-spacing: 6px; color: var(--gold-400); margin-bottom: 18px; word-break: break-all; }
+      .game-input { padding: 10px 16px; width: 80%; max-width: 320px; border-radius: 8px; border: 2px solid rgba(231,76,60,0.4); background: rgba(0,0,0,0.5); color: white; font-size: 1.05rem; text-align: center; margin-bottom: 12px; }
+      .game-input:focus { outline: none; border-color: #e74c3c; }
+      .btn-submit { background: #c0392b; color: white; padding: 10px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+      .btn-submit:hover { background: #e74c3c; }
+      .clicker-btn { background: #3498db; color: white; width: 120px; height: 120px; border-radius: 50%; border: none; font-weight: 900; cursor: pointer; font-size: 2.5rem; box-shadow: 0 10px 0 #2980b9, 0 15px 20px rgba(0,0,0,0.4); transition: transform 0.1s, box-shadow 0.1s; display: inline-flex; align-items: center; justify-content: center; user-select: none; }
+      .clicker-btn:active { transform: translateY(10px); box-shadow: 0 0 0 #2980b9; }
+      .clicker-btn.running { background: #e74c3c; box-shadow: 0 10px 0 #c0392b, 0 15px 20px rgba(0,0,0,0.4); }
+      .clicker-btn.running:active { box-shadow: 0 0 0 #c0392b; }
+      .clicker-timer { font-size: 1.5rem; font-weight: 900; color: #e74c3c; margin-bottom: 12px; }
+      .clicker-score { font-size: 2rem; font-weight: 900; color: var(--gold-400); margin-top: 12px; }
+      .btn-accept { background: #e74c3c; color: white; border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 1rem; transition: 0.2s; }
+      .btn-accept:hover { background: #c0392b; }
+      .btn-cancel { background: transparent; color: #95a5a6; border: 1px solid #95a5a6; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-left: 10px; transition: 0.2s; }
+      .btn-cancel:hover { border-color: #e74c3c; color: #e74c3c; }
+      .pulse-dot { width: 10px; height: 10px; background: #e74c3c; border-radius: 50%; animation: pulse 0.8s infinite; display: inline-block; }
+      @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.6; } }
+      .no-duel-msg { text-align: center; padding: 30px; }
+      .no-duel-msg p { color: rgba(249,240,224,0.55); font-size: 0.9rem; margin-top: 10px; }
+      .game-timer-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 15px; overflow: hidden; }
+      .game-timer-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #f39c12); border-radius: 4px; transition: width 0.1s linear; }
+      .pvp-info-strip { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.2); border-radius: 10px; padding: 15px 18px; margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.85rem; color: rgba(249,240,224,0.7); }
+      .pvp-info-strip strong { color: #e74c3c; }
+      .need-login { text-align: center; padding: 50px 20px; }
+      .need-login h3 { color: var(--gold-400); margin-bottom: 10px; }
+      .need-login p { color: rgba(249,240,224,0.6); font-size: 0.9rem; }
+      .my-pvp-card { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.3); border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+      .my-pvp-pts { font-size: 2rem; font-weight: 900; color: #e74c3c; }
+      .my-pvp-label { font-size: 0.8rem; color: rgba(249,240,224,0.5); }
+    </style>
+  </head>
+  <body class="dark-page">
+    <div id="page-veil" aria-hidden="true"></div>
+
+    <nav id="navbar" role="navigation" aria-label="Navigasi utama" class="navbar--scrolled">
+      <div class="navbar__inner">
+        <button id="accessibility-toggle" class="accessibility-toggle" aria-label="Buka panel aksesibilitas" aria-expanded="false" aria-controls="colorblind-popup" type="button">
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+          <span class="accessibility-toggle__line"></span>
+        </button>
+        <a href="index.html" class="navbar__logo" aria-label="Museum Digital Nasional Indonesia">
+          <span class="navbar__logo-title">Museum Digital</span>
+          <span class="navbar__logo-sub">Nasional Indonesia</span>
+        </a>
+        <button id="hamburger" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="nav-menu" type="button">
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+          <span class="hamburger__line"></span>
+        </button>
+        <div id="nav-menu" role="menubar">
+          <a href="index.html" class="nav-link" role="menuitem">Beranda</a>
+          <a href="about.html" class="nav-link" role="menuitem">Tentang</a>
+          <a href="explorer.html" class="nav-link" role="menuitem">Koleksi</a>
+          <a href="ai-center.html" class="nav-link" role="menuitem">AI Center</a>
+          <a href="quiz.html" class="nav-link" role="menuitem">Quiz AI</a>
+          <a href="pvp.html" class="nav-link nav-link--active" role="menuitem" style="color:#e74c3c;">⚔️ Arena PvP</a>
+          <a href="dashboard.html" class="nav-link" role="menuitem">Dashboard</a>
+          <button id="admin-panel-button" class="nav-link nav-link--button btn-small" type="button" aria-label="Buka panel admin" hidden>Admin</button>
+          <button id="login-button" class="nav-link nav-link--button" type="button" aria-label="Masuk atau profil pengguna">Masuk</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="pvp-hero">
+      <h1>⚔️ ARENA PvP — REBUT POIN</h1>
+      <p>Tantang pemain lain dan rampas 10 poin mereka! Kalah? Poin kamu yang diambil. Bertarung menggunakan mini-game yang berbeda tiap ronde.</p>
+    </div>
+
+    <main class="pvp-main">
+
+      <!-- Login Required Message -->
+      <div id="pvp-need-login" class="need-login" style="display:none;">
+        <h3>🔒 Akun Gmail Diperlukan</h3>
+        <p>Fitur Arena PvP hanya tersedia untuk pengguna yang mendaftar dengan akun Gmail.<br>Silakan masuk atau daftarkan Gmail Anda terlebih dahulu.</p>
+      </div>
+
+      <!-- My PvP Stats Bar -->
+      <div id="pvp-my-stats" style="display:none;" class="my-pvp-card">
+        <div>
+          <div class="my-pvp-pts" id="pvp-stat-pts">100</div>
+          <div class="my-pvp-label">Poin PvP Anda</div>
+        </div>
+        <div>
+          <div style="font-size:1.4rem; font-weight:900; color:#2ecc71;" id="pvp-stat-wins">0</div>
+          <div class="my-pvp-label">🔥 Menang</div>
+        </div>
+        <div>
+          <div style="font-size:1.4rem; font-weight:900; color:#f39c12;" id="pvp-stat-losses">0</div>
+          <div class="my-pvp-label">☠️ Kalah</div>
+        </div>
+        <div style="margin-left:auto;">
+          <div style="font-size:0.8rem; color:rgba(249,240,224,0.5); margin-bottom:5px;">Peraturan PvP:</div>
+          <div style="font-size:0.78rem; color:rgba(249,240,224,0.65);">Menang → +10 poin · Kalah → -10 poin · Seri → tidak ada perubahan</div>
+        </div>
+      </div>
+
+      <!-- Active Arena (muncul jika ada duel aktif) -->
+      <div id="pvp-arena-main" style="display:none; margin-bottom:30px;">
+        <div class="arena-box" id="pvp-arena-inner">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:15px;">
+            <span class="pulse-dot"></span>
+            <h2 style="color:#e74c3c; margin:0; font-size:1.25rem;">🔥 DUEL SEDANG BERLANGSUNG</h2>
+          </div>
+          <div id="pvp-arena-content">Memuat...</div>
+        </div>
+      </div>
+
+      <!-- Main Grid: Leaderboard + Info -->
+      <div id="pvp-content-grid" class="pvp-grid">
+        <!-- Papan Peringkat PvP -->
+        <div class="pvp-card">
+          <h2>👑 Papan Peringkat Raja Duel</h2>
+          <div id="pvp-leaderboard-list">
+            <p style="color:rgba(249,240,224,0.4); text-align:center; padding:20px;">Memuat...</p>
+          </div>
+        </div>
+
+        <!-- Info Cara Main -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="pvp-card">
+            <h2>🎮 Cara Bermain</h2>
+            <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:10px; font-size:0.88rem; color:rgba(249,240,224,0.75);">
+              <li>⚔️ Pilih lawan dari Papan Peringkat, klik <strong style="color:#e74c3c;">Tantang</strong></li>
+              <li>📧 Lawan mendapat email notifikasi untuk segera buka halaman ini</li>
+              <li>🎲 Sistem akan pilihkan <strong style="color:#e74c3c;">mini-game acak</strong> untuk ronde ini</li>
+              <li>⚡ Selesaikan game sebaik mungkin — skor dikunci setelah submit</li>
+              <li>🏆 Pemenang otomatis mendapat <strong style="color:#2ecc71;">+10 poin</strong> dari lawan</li>
+            </ul>
+          </div>
+          <div class="pvp-card">
+            <h2>🎲 Mini-Game yang Tersedia</h2>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px;">
+                <div style="font-weight:700; color:var(--gold-400); margin-bottom:4px;">🖼️ Tebak Gambar Batik</div>
+                <div style="font-size:0.8rem; color:rgba(249,240,224,0.6);">Gambar batik ditampilkan buram. Pilih nama yang benar dari 4 opsi secepat mungkin. Waktu tercepat menang!</div>
+              </div>
+              <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px;">
+                <div style="font-weight:700; color:var(--gold-400); margin-bottom:4px;">🔤 Susun Kata Anagram</div>
+                <div style="font-size:0.8rem; color:rgba(249,240,224,0.6);">Huruf-huruf nama batik diacak. Siapa yang berhasil menyusun kembali dengan benar dalam waktu tercepat?</div>
+              </div>
+              <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px;">
+                <div style="font-weight:700; color:var(--gold-400); margin-bottom:4px;">⚡ Adu Refleks Klik</div>
+                <div style="font-size:0.8rem; color:rgba(249,240,224,0.6);">5 detik, klik sebanyak-banyaknya! Jumlah klik terbanyak merampas poin lawan.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Colorblind popup / login modal (sama dengan halaman lain) -->
+    <aside id="colorblind-popup" class="colorblind-popup" role="dialog" aria-modal="true" aria-labelledby="cb-popup-title" hidden aria-hidden="true">
+      <button id="colorblind-popup-close" class="colorblind-popup__close" aria-label="Tutup mode aksesibilitas" type="button">×</button>
+      <div class="colorblind-popup__header">
+        <p class="cb-mode-group__title">Mode Aksesibilitas</p>
+        <h3 id="cb-popup-title" class="colorblind-popup__title">Simulasi Buta Warna</h3>
+      </div>
+      <div class="colorblind-popup__content">
+        <button class="cb-btn cb-btn--active" data-cb-mode="normal" aria-pressed="true" aria-label="Normal"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #2ecc71 33% 66%, #3498db 66%);"></span>Normal</button>
+        <button class="cb-btn" data-cb-mode="protanopia" aria-pressed="false" aria-label="Protanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #808000 33%, #808000 33% 66%, #3498db 66%);"></span>Protanopia</button>
+        <button class="cb-btn" data-cb-mode="deuteranopia" aria-pressed="false" aria-label="Deuteranopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #c8a000 33%, #c8a000 33% 66%, #3498db 66%);"></span>Deuteranopia</button>
+        <button class="cb-btn" data-cb-mode="tritanopia" aria-pressed="false" aria-label="Tritanopia"><span class="cb-btn__dot" style="background: linear-gradient(135deg, #e74c3c 33%, #00b0b0 33% 66%, #00b0b0 66%);"></span>Tritanopia</button>
+      </div>
+    </aside>
+
+    <aside id="login-modal" class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" hidden aria-hidden="true">
+      <button id="login-close-btn" class="login-modal__close" aria-label="Tutup login" type="button">×</button>
+      <div class="login-modal__header">
+        <h3 id="login-title">Masuk ke Akun</h3>
+        <p class="login-modal__text">Masuk dengan Gmail untuk menggunakan fitur PvP.</p>
+      </div>
+      <div class="login-mode-switch">
+        <button type="button" id="login-mode-btn" class="login-mode-btn login-mode-btn--active">Masuk</button>
+        <button type="button" id="register-mode-btn" class="login-mode-btn">Daftar</button>
+      </div>
+      <form id="login-form">
+        <label class="login-form__label">Nama Pengguna<input id="login-username" name="username" type="text" autocomplete="username" /></label>
+        <label class="login-form__label">Kata Sandi<input id="login-password" name="password" type="password" autocomplete="current-password" /></label>
+        <button id="auth-submit-btn" class="btn-primary" type="submit">Masuk</button>
+        <button id="logout-button" class="btn-secondary" type="button" style="display:none;">Keluar</button>
+      </form>
+      <p id="login-message" class="login-modal__message" aria-live="polite"></p>
+    </aside>
+
+    <!-- Scripts -->
+    <script src="js/firebase.js?v=6"></script>
+    <script src="js/batik-data.js?v=5"></script>
+    <script src="js/auth.js?v=12"></script>
+    <script src="js/pvp.js?v=3"></script>
+    <script src="js/main.js?v=9"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Wait for Firebase + Auth init
+        await new Promise(r => setTimeout(r, 600));
+        window.PvPSys?.initPage();
+      });
+    </script>
+  </body>
+</html>

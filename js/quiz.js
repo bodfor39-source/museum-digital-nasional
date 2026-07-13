@@ -72,8 +72,12 @@ const Quiz = (() => {
             ${renderLeaderboardHTML(leaderboard)}
           </div>
           
-          <!-- Papan Skor Duel PvP Rebut Poin -->
-          <div id="pvp-leaderboard-container"></div>
+          <!-- Link ke Arena PvP -->
+          <div style="margin-top:8px; background:linear-gradient(135deg,rgba(44,14,14,0.8),rgba(26,5,5,0.9)); border:1px solid rgba(231,76,60,0.4); border-radius:10px; padding:14px 16px; text-align:center;">
+            <div style="font-size:1.1rem; font-weight:800; color:#e74c3c; margin-bottom:4px;">⚔️ Ingin Rebut Poin Pemain Lain?</div>
+            <div style="font-size:0.82rem; color:rgba(249,240,224,0.6); margin-bottom:10px;">Gunakan fitur Arena PvP — tantang pemain lain dan rampas 10 poin mereka!</div>
+            <a href="pvp.html" style="display:inline-block;background:#e74c3c;color:white;padding:8px 20px;border-radius:8px;font-weight:700;font-size:0.88rem;text-decoration:none;">Buka Arena PvP →</a>
+          </div>
 
           <!-- Info Tier -->
           <div style="display:flex;flex-direction:column;gap:1rem;">
@@ -98,12 +102,6 @@ const Quiz = (() => {
       </div>
     `;
 
-    // Render PvP Leaderboard asinkron
-    if (window.PvPSys) {
-      setTimeout(() => {
-        window.PvPSys.renderPvPLeaderboard("pvp-leaderboard-container");
-      }, 50);
-    }
   }
 
   function renderLeaderboardHTML(lb) {
